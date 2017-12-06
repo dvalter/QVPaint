@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias = "cursor-arrow.svg">imgs/cursor-arrow.svg</file>
+        <file alias = "draw-cross.svg">imgs/draw-cross.svg</file>
+        <file alias = "draw-ellipse.svg">imgs/draw-ellipse.svg</file>
+        <file alias = "draw-ellipse-part.svg">imgs/draw-ellipse-part.svg</file>
+        <file alias = "draw-line.svg">imgs/draw-line.svg</file>
+        <file alias = "edit-map.svg">imgs/edit-map.svg</file>
+    </qresource>
+<RCC/>
