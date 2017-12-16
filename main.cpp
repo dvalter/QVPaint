@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 
         return a.exec();
 
-    } catch (Exception e){
+    } catch (std::exception e){
         return 123;
     }
 }

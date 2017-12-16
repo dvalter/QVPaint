@@ -27,12 +27,15 @@ SOURCES += \
         main.cpp \
         qvpmainwindow.cpp \
     qvpdocument.cpp \
-    qvpshape.cpp
+    qvpshape.cpp \
+    qvpline.cpp
 
 HEADERS += \
         qvpmainwindow.h \
     qvpdocument.h \
-    qvpshape.h
+    qvpshape.h \
+    config.h \
+    qvpline.h
 
 RESOURCES += \
     resource.qrc
