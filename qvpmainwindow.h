@@ -22,6 +22,7 @@ public slots:
     void hovered();
     void changed();
     void coordUpdated(QPoint coord);
+    void updateMode(QVP::editorMode);
 
 //signals:
 //    void updateCoord(QPoint coord);
@@ -35,8 +36,10 @@ private:
     QLabel* m_coordYlbl;
     QLabel* m_toolLbl;
     QLabel* m_messageLbl;
+    QMap<QVP::editorMode, QString> m_toolsMap;
 
-    void initToolbar(QToolBar*, QStringList, Qt::ToolBarArea);
+    void initToolbar(QToolBar*, QList<QVP::editorMode>, Qt::ToolBarArea);
+    void initToolsMap();
 };
 
 

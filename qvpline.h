@@ -5,6 +5,8 @@
 
 class QVPLine : public QVPShape
 {
+    Q_OBJECT
+
 public:
     explicit QVPLine(QObject *parent = nullptr);
     QVPLine(QObject *parent, QColor penColor);

@@ -76,10 +76,10 @@ void QVPDocument::mouseReleaseEvent(QMouseEvent *me)
 
 void QVPDocument::paintEvent(QPaintEvent *event)
 {
-    qDebug() << event;
+//    qDebug() << event;
 
 
-    qDebug() << m_mainImage;
+//    qDebug() << m_mainImage;
     const QRect paintRect = event->rect();
 
     QPainter painter(this);

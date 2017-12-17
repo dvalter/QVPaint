@@ -1,5 +1,6 @@
 #include "qvpmainwindow.h"
 #include <stdlib.h>
+#include "qvpaction.h"
 
 QString msgLabelText(const QString& str)
 {
@@ -19,8 +20,10 @@ QVPMainWindow::QVPMainWindow(QWidget *parent)
       m_toolLbl(new QLabel),
       m_messageLbl(new QLabel)
 {
-    QStringList toolbarElementsList({"selection", "dot", "line", "ellipse", "elliptic-curve", "cross"});
-    initToolbar(m_leftToolBar, toolbarElementsList, (Qt::LeftToolBarArea));
+
+    //QStringList toolbarElementsList({"selection", "dot", "line", "ellipse", "elliptic-curve", "cross"});
+    initToolsMap();
+    initToolbar(m_leftToolBar, m_toolsMap.keys(), (Qt::LeftToolBarArea));
 
     m_scrollArea->setBackgroundRole(QPalette::Dark);
     m_scrollArea->setWidget(m_mainDocument);
@@ -30,6 +33,7 @@ QVPMainWindow::QVPMainWindow(QWidget *parent)
 
     m_coordXlbl->setFont(QFont("Monospace"));
     m_coordYlbl->setFont(QFont("Monospace"));
+    m_toolLbl->setFont(QFont("Monospace"));
     m_coordXlbl->setText(QString("X:").append(QString::number(0, 'd', 5)));
     m_coordYlbl->setText(QString("Y:").append(QString::number(0, 'd', 5)));
 
@@ -55,25 +59,48 @@ QVPMainWindow::~QVPMainWindow()
 
 }
 
+void QVPMainWindow::initToolsMap()
+{
+    m_toolsMap.insert(QVP::selectShape, "Selection");
+    m_toolsMap.insert(QVP::drawDot, "Dot");
+    m_toolsMap.insert(QVP::drawLine, "Line");
+    m_toolsMap.insert(QVP::drawEllipse, "Ellipse");
+    m_toolsMap.insert(QVP::drawEllipticCurve, "Elliptic Curve");
+}
 
-
-void QVPMainWindow::initToolbar(QToolBar * toolBar, QStringList elements, Qt::ToolBarArea area)
+void QVPMainWindow::initToolbar(QToolBar * toolBar, QList<QVP::editorMode> elements, Qt::ToolBarArea area)
 {
     QActionGroup* acts = new QActionGroup(this);
-    for (QString name : elements){
-        QAction* act = new QAction(QPixmap(":/" + name + ".svg"),
-                                  name);
+    for (QVP::editorMode mode : elements){
+        QString name = m_toolsMap[mode];
+        QVPAction* act = new QVPAction(QPixmap(":/" + name + ".svg"), name, mode);
         act->setCheckable(true);
         acts->addAction(act);
+
         QObject::connect(act, &QAction::hovered, this, &QVPMainWindow::hovered);
         QObject::connect(act, &QAction::changed, this, &QVPMainWindow::changed);
         QObject::connect(act, &QAction::triggered, this, &QVPMainWindow::triggered);
         QObject::connect(act, &QAction::toggled, this, &QVPMainWindow::toggled);
+
+        QObject::connect(act, &QVPAction::toggled, this, &QVPMainWindow::updateMode);
+        QObject::connect(act, &QVPAction::toggled, m_mainDocument, &QVPDocument::setEditorMode);
+
+        if(mode == QVP::selectShape){
+            act->setChecked(true);
+        }
     }
     toolBar->addActions(acts->actions());
     toolBar->setFloatable(false);
     toolBar->setMovable(false);
     addToolBar(area, m_leftToolBar);
+}
+
+void QVPMainWindow::updateMode(QVP::editorMode mode)
+{
+
+    QString name = m_toolsMap[mode];
+    m_toolLbl->setText(name.rightJustified(20 - name.length(), ' '));
+
 }
 
 void QVPMainWindow::toggled(bool b){

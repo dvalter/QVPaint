@@ -16,6 +16,9 @@ namespace QVP
     // QVPaint modes
     enum editorMode{
         drawLine,
+        drawDot,
+        drawEllipse,
+        drawEllipticCurve,
         selectShape
     };
 

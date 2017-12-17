@@ -6,10 +6,19 @@
 
 class QVPAction : public QAction
 {
+    Q_OBJECT
 public:
     QVPAction(const QIcon &icon, const QString &label, const QVP::editorMode mode, QObject *parent=nullptr);
+
+
+signals:
+    void toggled(QVP::editorMode mode);
+
 private:
     QVP::editorMode m_mode;
+
+private slots:
+    void slotToggled(bool state);
 };
 
 #endif // QVPACTION_H

@@ -1,11 +1,11 @@
 <RCC>
     <qresource prefix="/">
-        <file alias="selection.svg">imgs/cursor-arrow.svg</file>
-        <file alias="cross.svg">imgs/draw-cross.svg</file>
-        <file alias="ellipse.svg">imgs/draw-ellipse.svg</file>
-        <file alias="elliptic-curve.svg">imgs/draw-ellipse-part.svg</file>
-        <file alias="line.svg">imgs/draw-line.svg</file>
-        <file alias="dot.svg">imgs/edit-map.svg</file>
+        <file alias="Selection.svg">imgs/cursor-arrow.svg</file>
+        <file alias="Cross.svg">imgs/draw-cross.svg</file>
+        <file alias="Ellipse.svg">imgs/draw-ellipse.svg</file>
+        <file alias="Elliptic Curve.svg">imgs/draw-ellipse-part.svg</file>
+        <file alias="Line.svg">imgs/draw-line.svg</file>
+        <file alias="Dot.svg">imgs/edit-map.svg</file>
         <file alias="sample.png">imgs/sample.png</file>
         <file alias="sample.jpg">imgs/sample.jpg</file>
     </qresource>
