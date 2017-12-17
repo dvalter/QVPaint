@@ -1,5 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
+
+#include <QColor>
+
 namespace QVP
 {
     // 150ppi A4 magic numbers
@@ -9,5 +12,18 @@ namespace QVP
     // default window params
     const int windowHeight = 400;
     const int windowWidth = 600;
+
+    // QVPaint modes
+    enum editorMode{
+        drawLine,
+        selectShape
+    };
+
+    // default bg color
+    const QColor backgroundColor(0xFF, 0xFF, 0xFF, 0xFF); // should be white
+
+    // default pen color
+    const QColor penColor(0x00, 0x0, 0x0, 0xFF); // should be black
+
 }
 #endif // CONFIG_H

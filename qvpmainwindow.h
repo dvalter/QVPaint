@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QtWidgets>
+//#include <boost/bimap.hpp>
 #include "qvpdocument.h"
 #include "config.h"
 
@@ -20,12 +21,20 @@ public slots:
     void toggled(bool);
     void hovered();
     void changed();
+    void coordUpdated(QPoint coord);
+
+//signals:
+//    void updateCoord(QPoint coord);
 
 private:
     QScrollArea* m_scrollArea;
     QToolBar* m_leftToolBar;
     //QLabel* m_imgLbl;
     QVPDocument* m_mainDocument;
+    QLabel* m_coordXlbl;
+    QLabel* m_coordYlbl;
+    QLabel* m_toolLbl;
+    QLabel* m_messageLbl;
 
     void initToolbar(QToolBar*, QStringList, Qt::ToolBarArea);
 };

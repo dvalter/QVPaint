@@ -1,30 +1,53 @@
 #include "qvpmainwindow.h"
 #include <stdlib.h>
 
+QString msgLabelText(const QString& str)
+{
+    QString labelText = "<P><b><i><FONT COLOR='#ff0000' FONT SIZE = 4>";
+    labelText .append(str);
+    labelText .append("</i></b></P></br>");
+    return labelText;
+}
+
 QVPMainWindow::QVPMainWindow(QWidget *parent)
     : QMainWindow(parent),
       m_scrollArea(new QScrollArea),
       m_leftToolBar(new QToolBar("Tools")),
-      //m_imgLbl(new QLabel)
-      m_mainDocument(new QVPDocument)
+      m_mainDocument(new QVPDocument),
+      m_coordXlbl(new QLabel),
+      m_coordYlbl(new QLabel),
+      m_toolLbl(new QLabel),
+      m_messageLbl(new QLabel)
 {
     QStringList toolbarElementsList({"selection", "dot", "line", "ellipse", "elliptic-curve", "cross"});
     initToolbar(m_leftToolBar, toolbarElementsList, (Qt::LeftToolBarArea));
-//    QImage img(":/sample.png");
-//    m_imgLbl->setBackgroundRole(QPalette::Base);
-//    m_imgLbl->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-//    m_imgLbl->setScaledContents(true);
-//    m_imgLbl->setPixmap(QPixmap::fromImage(img));
 
     m_scrollArea->setBackgroundRole(QPalette::Dark);
     m_scrollArea->setWidget(m_mainDocument);
-//    m_scrollArea->setVisible(false);
-
-
 
     m_scrollArea->setVisible(true);
     setCentralWidget(m_scrollArea);
-//    setCentralWidget(m_mainDocument);
+
+    m_coordXlbl->setFont(QFont("Monospace"));
+    m_coordYlbl->setFont(QFont("Monospace"));
+    m_coordXlbl->setText(QString("X:").append(QString::number(0, 'd', 5)));
+    m_coordYlbl->setText(QString("Y:").append(QString::number(0, 'd', 5)));
+
+    m_messageLbl->setStyleSheet("font-weight: bold; color: red");
+    m_messageLbl->setText("EARLY PRE-ALPHA!");
+    statusBar()->addWidget(m_coordXlbl);
+    statusBar()->addWidget(m_coordYlbl);
+    statusBar()->addWidget(m_toolLbl);
+    statusBar()->addWidget(m_messageLbl);
+
+    connect(m_mainDocument, &QVPDocument::updateCoord, this, &QVPMainWindow::coordUpdated);
+
+}
+
+void QVPMainWindow::coordUpdated(QPoint coord)
+{
+    m_coordXlbl->setText(QString().sprintf("%s: %4d", "X", coord.x()));
+    m_coordYlbl->setText(QString().sprintf("%s: %4d", "Y", coord.y()));
 }
 
 QVPMainWindow::~QVPMainWindow()

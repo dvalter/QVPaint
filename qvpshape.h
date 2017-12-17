@@ -9,10 +9,11 @@ class QVPShape : public QObject
 {
     Q_OBJECT
 public:
-    explicit QVPShape(QObject *parent = nullptr);
+    explicit QVPShape(QObject *parent = nullptr, QColor penColor = QVP::penColor);
     const QImage& getImage();
     virtual void handleMousePressEvent(QMouseEvent * me) = 0;
     virtual void handleMouseMoveEvent(QMouseEvent * me) = 0;
+    virtual void handleMouseReleaseEvent(QMouseEvent * me) = 0;
 
 signals:
 
@@ -22,8 +23,12 @@ public slots:
 
 protected:
 
+    virtual void update() = 0;
+
+    QColor m_penColor;
     QImage* m_image;
-    bool m_mouserPressed = false;
+    bool m_mousePressed = false;
+    bool m_selected = false;
 
 
 

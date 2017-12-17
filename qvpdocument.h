@@ -4,18 +4,26 @@
 #include <QtWidgets>
 #include <qvpshape.h>
 #include "config.h"
+#include "qvpline.h"
 
 class QVPDocument : public QLabel
 {
     Q_OBJECT
 public:
-    explicit QVPDocument(QWidget *parent = nullptr);
+    explicit QVPDocument(QWidget* parent = nullptr);
+
+public slots:
+    void setEditorMode(QVP::editorMode em);
 
 private:
-    QList<QVPShape *> shapes;
+    QList<QVPShape*> m_shapesList;
+    QVPShape* m_tmpShape = nullptr;
     QImage* m_mainImage;
     QLabel* m_imgLbl;
     qint8 m_counter = 0;
+    QVP::editorMode m_currentMode = QVP::drawLine;
+
+    void updateImage();
 
 
 protected:
@@ -25,8 +33,8 @@ protected:
     virtual void paintEvent(QPaintEvent* event) override;
 
 signals:
+    void updateCoord(QPoint coord);
 
-public slots:
 };
 
 #endif // QVPDOCUMENT_H
