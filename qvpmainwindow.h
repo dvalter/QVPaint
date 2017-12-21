@@ -7,6 +7,8 @@
 #include "qvpdocument.h"
 #include "config.h"
 
+typedef QPair<QVP::editorMode, QString> QVPToolPair;
+
 class QVPMainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -36,10 +38,11 @@ private:
     QLabel* m_coordYlbl;
     QLabel* m_toolLbl;
     QLabel* m_messageLbl;
-    QMap<QVP::editorMode, QString> m_toolsMap;
+    QList<QVPToolPair> m_toolsList;
 
-    void initToolbar(QToolBar*, QList<QVP::editorMode>, Qt::ToolBarArea);
-    void initToolsMap();
+
+    void initToolbar(QToolBar*, QList<QVPToolPair>, Qt::ToolBarArea);
+    void initToolsList();
 };
 
 

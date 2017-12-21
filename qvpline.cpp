@@ -5,33 +5,23 @@
 QVPLine::QVPLine(QColor penColor):
     QVPShape(nullptr, penColor)
 {
-    testWGT = new QLabel();
-
-    testWGT->setPixmap(QPixmap::fromImage(*m_image));
-    //testWGT->show();
 
 }
 
 QVPLine::QVPLine(QObject * parent, QColor penColor):
     QVPShape(parent, penColor)
 {
-    testWGT = new QLabel();
 
-    testWGT->setPixmap(QPixmap::fromImage(*m_image));
-    //testWGT->show();
 }
 
 QVPLine::QVPLine(QObject * parent):
     QVPShape(parent, QVP::penColor)
 {
-    testWGT = new QLabel();
 
-    testWGT->setPixmap(QPixmap::fromImage(*m_image));
-    //testWGT->show();
 }
 
 
-static QVector<QPoint> bresenham_line(int x1, int y1, int x2, int y2)
+QVector<QPoint> bresenham_line(int x1, int y1, int x2, int y2)
 {
     QVector<QPoint> line;
     const int deltaX = abs(x2 - x1);
@@ -90,8 +80,8 @@ void QVPLine::drawLine(QColor color)
                 m_firstPoint.x(), m_firstPoint.y(),
                 m_lastPoint.x(), m_lastPoint.y());
 
-    painter.drawPolyline(vec.data(), vec.size());
-    testWGT->setPixmap(QPixmap::fromImage(*m_image));
+    //painter.drawPolyline(vec.data(), vec.size());
+    painter.drawPoints(vec.data(), vec.size());
 
     if(m_selected){
         pen.setWidth(10);
@@ -104,7 +94,7 @@ void QVPLine::drawLine(QColor color)
 
 void QVPLine::handleMousePressEvent(QMouseEvent * me)
 {
-    qDebug() << __FILE__ << ":" << __FUNCTION__;
+    //qDebug() << __FILE__ << ":" << __FUNCTION__;
     m_firstPoint = me->pos();
     m_lastPoint = me->pos();
     m_mousePressed = true;
@@ -113,14 +103,14 @@ void QVPLine::handleMousePressEvent(QMouseEvent * me)
 
 void QVPLine::handleMouseMoveEvent(QMouseEvent * me)
 {
-    qDebug() << __FILE__ << ":" << __FUNCTION__;
+    //qDebug() << __FILE__ << ":" << __FUNCTION__;
     m_lastPoint = me->pos();
     update();
 }
 
 void QVPLine::handleMouseReleaseEvent(QMouseEvent * me)
 {
-    qDebug() << __FILE__ << ":" << __FUNCTION__;
+    //qDebug() << __FILE__ << ":" << __FUNCTION__;
     m_lastPoint = me->pos();
     m_mousePressed = false;
     update();

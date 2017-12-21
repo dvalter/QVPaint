@@ -12,3 +12,12 @@ const QImage& QVPShape::getImage()
 {
     return *m_image;
 }
+
+void QVPShape::select(bool state)
+{
+    qDebug() << this << state;
+    if (m_selected != state){
+        m_selected = state;
+        update();
+    }
+}

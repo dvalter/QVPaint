@@ -5,6 +5,9 @@
 #include <qvpshape.h>
 #include "config.h"
 #include "qvpline.h"
+#include "qvpellipse.h"
+#include "qvpellipticarc.h"
+
 
 class QVPDocument : public QLabel
 {
@@ -24,6 +27,8 @@ private:
     QVP::editorMode m_currentMode = QVP::drawLine;
 
     void updateImage();
+    void searchPixel(QPoint);
+    int checkPixel(QPoint);
 
 
 protected:

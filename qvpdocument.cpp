@@ -27,48 +27,108 @@ QVPDocument::QVPDocument(QWidget* parent) :
 void QVPDocument::mousePressEvent(QMouseEvent* me)
 {
     qDebug() << __FUNCTION__ << me;
-//    m_counter++;
-//    if (m_counter > 10){
-//        qDebug() << "Upd2; couner=" << m_counter;
-//        *m_mainImage = QImage(":/sample.png");
-//        m_counter = 0;
-//        m_imgLbl->setPixmap(QPixmap::fromImage(*m_mainImage));
-//    } else if (m_counter > 5){
-//        qDebug() << "Upd1; couner=" << m_counter;
-//        *m_mainImage = QImage(":/sample.jpg");
-//        m_imgLbl->setPixmap(QPixmap::fromImage(*m_mainImage));
-//    }
-    if (m_currentMode == QVP::drawLine){
-        if (me->button() == Qt::LeftButton){
+    if (me->button() == Qt::LeftButton){
+        if (m_currentMode == QVP::drawLine){
             m_tmpShape = new QVPLine();
             m_tmpShape->handleMousePressEvent(me);
+            updateImage();
+        } elif (m_currentMode == QVP::drawEllipse){
+            m_tmpShape = new QVPEllipse();
+            m_tmpShape->handleMousePressEvent(me);
+            updateImage();
+        } elif (m_currentMode == QVP::drawEllipticCurve){
+            if (m_tmpShape == nullptr){
+                m_tmpShape = new QVPEllipticArc();
+            }
+            m_tmpShape->handleMousePressEvent(me);
+            updateImage();
+        } elif (m_currentMode == QVP::selectShape){
+            searchPixel(me->pos());
+            updateImage();
         }
-        updateImage();
     }
 }
 
+void QVPDocument::searchPixel(QPoint point)
+{
+    if (-1 != checkPixel(point))
+        return;
+    int x = point.x();
+    int y = point.y();
+    for(int i = 0; i < QVP::searchWidth; i++){
+        for(int j = 0; j < i + 2; j++){
+            int xDelta = j;
+            int yDelta = i - j + 1;
+            if (-1 != checkPixel(QPoint(x + xDelta, y + yDelta)))
+                return;
+            if (-1 != checkPixel(QPoint(x - xDelta, y + yDelta)))
+                return;
+            if (-1 != checkPixel(QPoint(x + xDelta, y - yDelta)))
+                return;
+            if (-1 != checkPixel(QPoint(x - xDelta, y - yDelta)))
+                return;
+        }
+    }
+}
+
+int QVPDocument::checkPixel(QPoint point){
+
+//    m_mainImage->setPixelColor(point, Qt::blue);
+//    update(m_mainImage->rect());
+
+    int counter = 0;
+    for(QVPShape* shape : m_shapesList){
+        if (qAlpha(shape->getImage().pixel(point.x(), point.y())) != 0x00){
+            shape->select(true);
+            return counter;
+        } else {
+            shape->select(false);
+        }
+        counter++;
+    }
+    if (counter >= m_shapesList.size()){
+        return -1;
+    } else {
+        return -2;
+    }
+}
+
+
 void QVPDocument::mouseMoveEvent(QMouseEvent *me)
 {
-    qDebug() << __FUNCTION__ << me;
+    //Debug() << __FUNCTION__ << me;
 
     emit updateCoord(me->pos());
 
-    if (m_currentMode == QVP::drawLine){
+    if (m_currentMode == QVP::drawLine || m_currentMode == QVP::drawEllipse){
         if (me->buttons() & Qt::LeftButton){
             m_tmpShape->handleMouseMoveEvent(me);
         }
+        updateImage();
+    } elif (m_currentMode == QVP::drawEllipticCurve && m_tmpShape != nullptr){
+        qDebug() << "mme=" << me;
+        m_tmpShape->handleMouseMoveEvent(me);
         updateImage();
     }
 }
 
 void QVPDocument::mouseReleaseEvent(QMouseEvent *me)
 {
-    qDebug() << __FUNCTION__ << me;
-    if (m_currentMode == QVP::drawLine){
+//    qDebug() << __FUNCTION__ << me;
+    if (m_currentMode == QVP::drawLine  || m_currentMode == QVP::drawEllipse){
         if (me->button() == Qt::LeftButton){
             m_tmpShape->handleMouseReleaseEvent(me);
             m_shapesList.append(m_tmpShape);
             m_tmpShape = nullptr;
+        }
+        updateImage();
+    } elif (m_currentMode == QVP::drawEllipticCurve){
+        if (me->button() == Qt::LeftButton){
+            m_tmpShape->handleMouseReleaseEvent(me);
+            if (m_tmpShape->isReady()){
+                m_shapesList.append(m_tmpShape);
+                m_tmpShape = nullptr;
+            }
         }
         updateImage();
     }
@@ -103,10 +163,8 @@ void QVPDocument::updateImage()
 {
     QPainter pm(m_mainImage);
 
-    //QImage background(":/sample.png");
     QImage background(m_mainImage->size(), m_mainImage->format());
     background.fill(QVP::backgroundColor);
-    qDebug() << background;
 
     pm.setCompositionMode(QPainter::CompositionMode_Source);
     pm.fillRect(m_mainImage->rect(), Qt::transparent);

@@ -24,6 +24,8 @@ SOURCES += \
     qvpdocument.cpp \
     qvpshape.cpp \
     qvpline.cpp \
+    qvpellipse.cpp \
+    qvpellipticarc.cpp \
     qvpaction.cpp
 
 HEADERS += \
@@ -32,6 +34,8 @@ HEADERS += \
     qvpshape.h \
     config.h \
     qvpline.h \
+    qvpellipse.h \
+    qvpellipticarc.h \
     qvpaction.h
 
 RESOURCES += \

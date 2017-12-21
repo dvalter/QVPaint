@@ -28,5 +28,8 @@ namespace QVP
     // default pen color
     const QColor penColor(0x00, 0x0, 0x0, 0xFF); // should be black
 
+    const int searchWidth = 6;
 }
+
+#define elif else if
 #endif // CONFIG_H

@@ -14,6 +14,8 @@ public:
     virtual void handleMousePressEvent(QMouseEvent * me) = 0;
     virtual void handleMouseMoveEvent(QMouseEvent * me) = 0;
     virtual void handleMouseReleaseEvent(QMouseEvent * me) = 0;
+    virtual bool isReady() { return !m_mousePressed; }
+    void select(bool state);
 
 signals:
 

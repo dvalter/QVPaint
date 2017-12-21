@@ -24,7 +24,8 @@ private:
     QPoint m_firstPoint;
     QPoint m_lastPoint;
 
-    QLabel* testWGT;
+    //QLabel* testWGT;
 };
+QVector<QPoint> bresenham_line(int x1, int y1, int x2, int y2);
 
 #endif // QVPLINE_H
