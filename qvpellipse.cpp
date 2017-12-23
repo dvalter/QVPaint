@@ -110,7 +110,7 @@ void QVPEllipse::update()
     QColor color;
     if (m_selected){
         color = QColor(0xFF - m_penColor.red(), 0xFF - m_penColor.green(), 0xFF - m_penColor.blue(), 0xFF);
-        if(color == QVP::backgroundColor){
+        if (color == QVP::backgroundColor){
             color = QColor(0xFF, 0x0, 0x0, 0xFF); // shoud be red
         }
     } else {
@@ -134,11 +134,12 @@ void QVPEllipse::drawEllipse(QColor color)
     painter.drawPoints(vec.data(), vec.size());
 
 
-    if(m_selected){
+    if (m_selected){
         pen.setWidth(10);
-        pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
+        pen.setColor(QColor(0xFF, 0x00, 0x0, 0xFF));
         painter.setPen(pen);
         painter.drawPoint(m_center);
+        //painter.end();
         pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
         painter.setPen(pen);
         painter.drawPoint(QPoint(m_center.x() + m_a, m_center.y() + m_b));

@@ -38,12 +38,12 @@ QVector<QPoint> bresenham_line(int x1, int y1, int x2, int y2)
 
         const int error2 = error * 2;
 
-        if(error2 > -deltaY)
+        if (error2 > -deltaY)
         {
             error -= deltaY;
             x1 += signX;
         }
-        if(error2 < deltaX)
+        if (error2 < deltaX)
         {
             error += deltaX;
             y1 += signY;
@@ -57,7 +57,7 @@ void QVPLine::update()
     QColor color;
     if (m_selected){
         color = QColor(0xFF - m_penColor.red(), 0xFF - m_penColor.green(), 0xFF - m_penColor.blue(), 0xFF);
-        if(color == QVP::backgroundColor){
+        if (color == QVP::backgroundColor){
             color = QColor(0xFF, 0x0, 0x0, 0xFF); // shoud be red
         }
     } else {
@@ -65,6 +65,10 @@ void QVPLine::update()
     }
 
     drawLine(color);
+    if (m_rasterized){
+        delete m_rasterized;
+    }
+    m_rasterized = new QVPRasterizedShape;
 }
 
 void QVPLine::drawLine(QColor color)
@@ -83,7 +87,7 @@ void QVPLine::drawLine(QColor color)
     //painter.drawPolyline(vec.data(), vec.size());
     painter.drawPoints(vec.data(), vec.size());
 
-    if(m_selected){
+    if (m_selected){
         pen.setWidth(10);
         pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
         painter.setPen(pen);
@@ -114,4 +118,11 @@ void QVPLine::handleMouseReleaseEvent(QMouseEvent * me)
     m_lastPoint = me->pos();
     m_mousePressed = false;
     update();
+}
+
+QVPRasterizedShape& QVPLine::getRasterized()
+{
+    if (!m_rasterized)
+        update();
+    return *m_rasterized;
 }

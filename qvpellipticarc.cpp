@@ -92,7 +92,7 @@ void QVPEllipticArc::update()
     QColor color;
     if (m_selected){
         color = QColor(0xFF - m_penColor.red(), 0xFF - m_penColor.green(), 0xFF - m_penColor.blue(), 0xFF);
-        if(color == QVP::backgroundColor){
+        if (color == QVP::backgroundColor){
             color = QColor(0xFF, 0x0, 0x0, 0xFF); // shoud be red
         }
     } else {
@@ -124,7 +124,7 @@ void QVPEllipticArc::drawEllipse(QColor color)
     painter.drawPoints(vec.data(), vec.size());
 
 
-    if(m_selected){
+    if (m_selected){
         pen.setWidth(10);
         pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
         painter.setPen(pen);
@@ -140,7 +140,7 @@ void QVPEllipticArc::drawEllipse(QColor color)
 
 
 
-void QVPEllipticArc::drawLine(QColor color, QPoint point){
+void QVPEllipticArc::drawLine(QColor color, QPointF point){
     QPainter painter(m_image);
     QPen pen(color);
     pen.setWidth(1);
@@ -189,7 +189,7 @@ void QVPEllipticArc::handleMouseMoveEvent(QMouseEvent * me)
              << "\nf=" << m_firstPoint << " l=" << m_lastPoint
              << "\nc=" << m_center << " a=" << m_a << " b=" << m_b
              << "\na1=" << m_ang1 << " a2=" << m_ang2;
-    if(m_state < 2){
+    if (m_state < 2){
         m_lastPoint = me->pos();
         initEllipseParams();
     } elif (m_state < 4) {
@@ -211,7 +211,7 @@ void QVPEllipticArc::handleMouseReleaseEvent(QMouseEvent * me)
              << "\nf=" << m_firstPoint << " l=" << m_lastPoint
              << "\nc=" << m_center << " a=" << m_a << " b=" << m_b
              << "\na1=" << m_ang1 << " a2=" << m_ang2;
-    if(m_state < 2){
+    if (m_state < 2){
         m_lastPoint = me->pos();
         initEllipseParams();
     } elif (m_state < 4) {
@@ -227,7 +227,7 @@ void QVPEllipticArc::handleMouseReleaseEvent(QMouseEvent * me)
     update();
 }
 
-inline float QVPEllipticArc::sin(QPoint point)
+inline float QVPEllipticArc::sin(QPointF point)
 {
     float x = point.x() - m_center.x();
     float y = point.y() - m_center.y();
@@ -235,7 +235,7 @@ inline float QVPEllipticArc::sin(QPoint point)
 }
 
 
-inline float QVPEllipticArc::cos(QPoint point)
+inline float QVPEllipticArc::cos(QPointF point)
 {
     float x = point.x() - m_center.x();
     float y = point.y() - m_center.y();

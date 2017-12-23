@@ -178,7 +178,7 @@ void QVPDocument::updateImage()
 
     }
 
-    if(m_tmpShape != nullptr){
+    if (m_tmpShape != nullptr){
         pm.drawImage(0,0, m_tmpShape->getImage());
 
     }

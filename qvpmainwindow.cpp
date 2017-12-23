@@ -84,7 +84,7 @@ void QVPMainWindow::initToolbar(QToolBar * toolBar, QList<QVPToolPair > elements
         QObject::connect(act, &QVPAction::toggled, this, &QVPMainWindow::updateMode);
         QObject::connect(act, &QVPAction::toggled, m_mainDocument, &QVPDocument::setEditorMode);
 
-        if(mode.first == QVP::selectShape){
+        if (mode.first == QVP::selectShape){
             act->setChecked(true);
         }
     }
@@ -99,7 +99,7 @@ void QVPMainWindow::updateMode(QVP::editorMode mode)
 
     QString name("None");
     for (QVPToolPair pair : m_toolsList){
-        if(pair.first == mode){
+        if (pair.first == mode){
             name = pair.second;
         }
     }

@@ -17,6 +17,7 @@ public:
     virtual void handleMousePressEvent(QMouseEvent * me) override;
     virtual void handleMouseReleaseEvent(QMouseEvent * me) override;
     virtual bool isReady() override { return m_state > 4; }
+    virtual QVPRasterizedShape& getRasterized() {return *(new QVPRasterizedShape());}
 
 protected:
     virtual void update() override;
@@ -24,20 +25,20 @@ protected:
 private:
     void drawEllipse(QColor color);
     void drawLine(QColor color);
-    void drawLine(QColor color, QPoint point);
+    void drawLine(QColor color, QPointF point);
     inline bool checkPoint(QPoint point);
 
-    inline float sin(QPoint point);
-    inline float cos(QPoint point);
+    inline float sin(QPointF point);
+    inline float cos(QPointF point);
     inline void appendPoint(QPoint point, QVector<QPoint>& vec);
     QVector<QPoint> bresenham_elliptic_arc(int x, int y, int a, int b);
     inline void initEllipseParams();
 
-    QPoint m_center;
-    int m_a;
-    int m_b;
-    QPoint m_firstPoint;
-    QPoint m_lastPoint;
+    QPointF m_center;
+    float m_a;
+    float m_b;
+    QPointF m_firstPoint;
+    QPointF m_lastPoint;
     int m_state = 0;
     float m_ang1;
     float m_ang2;

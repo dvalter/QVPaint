@@ -26,7 +26,9 @@ SOURCES += \
     qvpline.cpp \
     qvpellipse.cpp \
     qvpellipticarc.cpp \
-    qvpaction.cpp
+    qvpaction.cpp \
+    qvprasterizedshape.cpp \
+    qvpshapeactions.cpp
 
 HEADERS += \
         qvpmainwindow.h \
@@ -36,7 +38,9 @@ HEADERS += \
     qvpline.h \
     qvpellipse.h \
     qvpellipticarc.h \
-    qvpaction.h
+    qvpaction.h \
+    qvprasterizedshape.h \
+    qvpshapeactions.h
 
 RESOURCES += \
     resource.qrc

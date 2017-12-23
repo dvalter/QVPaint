@@ -21,3 +21,18 @@ void QVPShape::select(bool state)
         update();
     }
 }
+
+
+int QVPShape::testPoint(QPoint point)
+{
+    int min = 72;
+    for (QPoint shapePoint : *m_shapePoints){
+        int distX = abs(shapePoint.x() - point.x()) < 6;
+        int distY = abs(shapePoint.y() - point.y()) < 6;
+        if (distX < 6 && distY < 6){
+            int square =  distX*distX + distY*distY;
+            min = min > square ? min : square;
+        }
+    }
+    return min;
+}

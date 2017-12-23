@@ -10,7 +10,7 @@ QVPAction::QVPAction(const QIcon& icon, const QString& label, const QVP::editorM
 
 void QVPAction::slotToggled(bool state)
 {
-    if(state){
+    if (state){
         emit toggled(m_mode);
     }
 }

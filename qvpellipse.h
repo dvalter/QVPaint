@@ -14,6 +14,7 @@ public:
     virtual void handleMouseMoveEvent(QMouseEvent * me) override;
     virtual void handleMousePressEvent(QMouseEvent * me) override;
     virtual void handleMouseReleaseEvent(QMouseEvent * me) override;
+    virtual QVPRasterizedShape& getRasterized() {return *(new QVPRasterizedShape());}
 
 protected:
     virtual void update() override;
@@ -22,11 +23,11 @@ private:
     void drawEllipse(QColor color);
     inline void initEllipseParams();
 
-    QPoint m_center;
+    QPointF m_center;
     int m_a;
     int m_b;
-    QPoint m_firstPoint;
-    QPoint m_lastPoint;
+    QPointF m_firstPoint;
+    QPointF m_lastPoint;
 
     //QLabel* testWGT;
 };
