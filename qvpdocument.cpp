@@ -80,6 +80,7 @@ int QVPDocument::checkPixel(QPoint point){
     for(QVPShape* shape : m_shapesList){
         if (qAlpha(shape->getImage().pixel(point.x(), point.y())) != 0x00){
             shape->select(true);
+            qDebug()  << shape->metaObject()->className();
             return counter;
         } else {
             shape->select(false);
