@@ -46,16 +46,15 @@ inline void QVPEllipticArc::appendPoint(QPoint point, QVector<QPoint>& vec)
     }
 }
 
-QVector<QPoint> QVPEllipticArc::bresenham_elliptic_arc(int x, int y, int a, int b)
+ void QVPEllipticArc::bresenham_elliptic_arc(QVector<QPoint>& ellipse, int x, int y, int a, int b)
 {
-    qDebug() << "andgle1=" << m_ang1 << " angle2=" << m_ang2;
-    QVector<QPoint> ellipse;
+//    qDebug() << "andgle1=" << m_ang1 << " angle2=" << m_ang2;
+//    QVector<QPoint> ellipse;
     if (!a && !b){
         ellipse.append(QPoint(x,y));
-        return ellipse;
+        return;
     }
-//    int col,row;
-//    long a_square,b_square,two_a_square,two_b_square,four_a_square,four_b_square,d;
+
 
     QPoint point;
     long b_square = b * b;
@@ -95,7 +94,7 @@ QVector<QPoint> QVPEllipticArc::bresenham_elliptic_arc(int x, int y, int a, int 
         d += two_a_square*(3-(row <<1));
     }
 
-    return ellipse;
+    //eturn ellipse;
 }
 
 
@@ -121,6 +120,11 @@ void QVPEllipticArc::update()
         drawLine(color, m_firstPoint);
         drawLine(color, m_lastPoint);
     }
+
+    if (m_rasterized != nullptr){
+        delete m_rasterized;
+    }
+    m_rasterized = new QVPRasterizedShape(m_shapePoints, color, 2);
 }
 
 void QVPEllipticArc::drawEllipse(QColor color)
@@ -132,10 +136,12 @@ void QVPEllipticArc::drawEllipse(QColor color)
     painter.setPen(pen);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setBrush(QBrush(Qt::NoBrush));
-    QVector<QPoint> vec = bresenham_elliptic_arc(
+
+    m_shapePoints->clear();
+    bresenham_elliptic_arc(*m_shapePoints,
                 m_center.x(), m_center.y(), m_a, m_b);
 
-    painter.drawPoints(vec.data(), vec.size());
+    painter.drawPoints(m_shapePoints->data(), m_shapePoints->size());
 
 
     if (m_selected){
@@ -161,12 +167,12 @@ void QVPEllipticArc::drawLine(QColor color, QPointF point){
     painter.setPen(pen);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    QVector<QPoint> vec = bresenham_line(
+    bresenham_line(*m_shapePoints,
                 m_center.x(), m_center.y(),
                 point.x(), point.y());
 
-    //painter.drawPolyline(vec.data(), vec.size());
-    painter.drawPoints(vec.data(), vec.size());
+
+    painter.drawPoints(m_shapePoints->data(), m_shapePoints->size());
 }
 
 
@@ -295,7 +301,7 @@ inline bool QVPEllipticArc::checkPoint(QPoint point){
     float angle = angleFromSC(sin(point), cos(point));
 
     if (m_ang1 < m_ang2){
-        return result =  angle > m_ang1 && angle < m_ang2;
+        return angle > m_ang1 && angle < m_ang2;
     } elif (m_ang1 > m_ang2) {
         return angle > m_ang1 || angle < m_ang2;
     } else {

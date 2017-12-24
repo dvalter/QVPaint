@@ -14,7 +14,7 @@ public:
     virtual void handleMouseMoveEvent(QMouseEvent * me) override;
     virtual void handleMousePressEvent(QMouseEvent * me) override;
     virtual void handleMouseReleaseEvent(QMouseEvent * me) override;
-    virtual QVPRasterizedShape& getRasterized() {return *(new QVPRasterizedShape());}
+    virtual QVPRasterizedShape& getRasterized() { return *m_rasterized; }
     virtual QString toString() override;
 
 protected:
@@ -33,6 +33,6 @@ private:
     //QLabel* testWGT;
 };
 
-QVector<QPoint> bresenham_ellipse(int x, int y, int a, int b);
+void bresenham_ellipse(QVector<QPoint> &ellipse, int x, int y, int a, int b);
 
 #endif // QVPEllipse_H

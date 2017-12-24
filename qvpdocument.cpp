@@ -3,6 +3,9 @@
 #include <QDebug>
 #include <stdlib.h>
 
+
+
+
 QVPDocument::QVPDocument(QWidget* parent) :
     QLabel(parent),
     m_mainImage(new QImage(QVP::imageWigth, QVP::imageHeight, QImage::Format_ARGB32_Premultiplied)),
@@ -22,7 +25,11 @@ void QVPDocument::mousePressEvent(QMouseEvent* me)
 {
     qDebug() << __FUNCTION__ << me;
     if (me->button() == Qt::LeftButton){
-        if (m_currentMode == QVP::drawLine){
+        if (m_currentMode == QVP::drawDot){
+            m_tmpShape = new QVPDot(this);
+            m_tmpShape->handleMousePressEvent(me);
+            updateImage();
+        } elif (m_currentMode == QVP::drawLine){
             m_tmpShape = new QVPLine(this);
             m_tmpShape->handleMousePressEvent(me);
             updateImage();
@@ -95,7 +102,8 @@ void QVPDocument::mouseMoveEvent(QMouseEvent *me)
 
     emit updateCoord(me->pos());
 
-    if (m_currentMode == QVP::drawLine || m_currentMode == QVP::drawEllipse){
+    if (m_currentMode == QVP::drawLine || m_currentMode == QVP::drawEllipse
+            || m_currentMode == QVP::drawDot){
         if (me->buttons() & Qt::LeftButton){
             m_tmpShape->handleMouseMoveEvent(me);
         }
@@ -110,7 +118,8 @@ void QVPDocument::mouseMoveEvent(QMouseEvent *me)
 void QVPDocument::mouseReleaseEvent(QMouseEvent *me)
 {
 //    qDebug() << __FUNCTION__ << me;
-    if (m_currentMode == QVP::drawLine  || m_currentMode == QVP::drawEllipse){
+    if (m_currentMode == QVP::drawLine  || m_currentMode == QVP::drawEllipse
+            || m_currentMode == QVP::drawDot){
         if (me->button() == Qt::LeftButton){
             m_tmpShape->handleMouseReleaseEvent(me);
             m_shapesList.append(m_tmpShape);
@@ -156,30 +165,43 @@ void QVPDocument::setEditorMode(QVP::editorMode em)
 
 void QVPDocument::updateImage()
 {
-    QPainter pm(m_mainImage);
-
-    QImage background(m_mainImage->size(), m_mainImage->format());
-    background.fill(QVP::backgroundColor);
-
-    pm.setCompositionMode(QPainter::CompositionMode_Source);
-    pm.fillRect(m_mainImage->rect(), Qt::transparent);
-
-    pm.setCompositionMode(QPainter::CompositionMode_SourceOver);
-    pm.drawImage(0,0, background);
-
-    for(auto shape : m_shapesList){
-        pm.drawImage(0,0, shape->getImage());
-
+    m_mainImage->fill(QVP::backgroundColor);
+    for (auto shape : m_shapesList){
+        shape->getRasterized()(m_mainImage);
     }
-
-    if (m_tmpShape != nullptr){
-        pm.drawImage(0,0, m_tmpShape->getImage());
-
+    if (m_tmpShape){
+        m_tmpShape->getRasterized()(m_mainImage);
     }
-    pm.end();
 
     update(m_mainImage->rect());
 }
+
+//void QVPDocument::updateImageOld()
+//{
+//    QPainter pm(m_mainImage);
+
+//    QImage background(m_mainImage->size(), m_mainImage->format());
+//    background.fill(QVP::backgroundColor);
+
+//    pm.setCompositionMode(QPainter::CompositionMode_Source);
+//    pm.fillRect(m_mainImage->rect(), Qt::transparent);
+
+//    pm.setCompositionMode(QPainter::CompositionMode_SourceOver);
+//    pm.drawImage(0,0, background);
+
+//    for(auto shape : m_shapesList){
+//        pm.drawImage(0,0, shape->getImage());
+
+//    }
+
+//    if (m_tmpShape != nullptr){
+//        pm.drawImage(0,0, m_tmpShape->getImage());
+
+//    }
+//    pm.end();
+
+//    update(m_mainImage->rect());
+//}
 
 bool QVPDocument::saveToFile(QString fileName)
 {

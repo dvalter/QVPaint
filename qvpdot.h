@@ -1,16 +1,16 @@
-#ifndef QVPLINE_H
-#define QVPLINE_H
+#ifndef QVPDOT_H
+#define QVPDOT_H
 
 #include "qvpshape.h"
 
-class QVPLine : public QVPShape
+class QVPDot : public QVPShape
 {
     Q_OBJECT
 
 public:
-    explicit QVPLine(QObject *parent = nullptr);
-    QVPLine(QObject *parent, QColor penColor);
-    QVPLine(QColor penColor);
+    explicit QVPDot(QObject *parent = nullptr);
+    QVPDot(QObject *parent, QColor penColor);
+    QVPDot(QColor penColor);
     virtual void handleMouseMoveEvent(QMouseEvent * me) override;
     virtual void handleMousePressEvent(QMouseEvent * me) override;
     virtual void handleMouseReleaseEvent(QMouseEvent * me) override;
@@ -21,14 +21,11 @@ protected:
     virtual void update() override;
 
 private:
-    void drawLine(QColor color);
+    void drawDot(QColor color);
 
     QPointF m_firstPoint;
-    QPointF m_lastPoint;
 
-    //QLabel* testWGT;
 };
-//QVector<QPoint> bresenham_line(int x1, int y1, int x2, int y2);
-void bresenham_line(QVector<QPoint>& line, int x1, int y1, int x2, int y2);
 
-#endif // QVPLINE_H
+
+#endif // QVPDOT_H

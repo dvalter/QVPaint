@@ -3,6 +3,8 @@
 #include <sstream>
 
 
+
+
 QVPLine::QVPLine(QColor penColor):
     QVPShape(nullptr, penColor)
 {
@@ -22,9 +24,9 @@ QVPLine::QVPLine(QObject * parent):
 }
 
 
-QVector<QPoint> bresenham_line(int x1, int y1, int x2, int y2)
+void bresenham_line(QVector<QPoint>& line, int x1, int y1, int x2, int y2)
 {
-    QVector<QPoint> line;
+//    QVector<QPoint> line;
     const int deltaX = abs(x2 - x1);
     const int deltaY = abs(y2 - y1);
     const int signX = x1 < x2 ? 1 : -1;
@@ -50,7 +52,7 @@ QVector<QPoint> bresenham_line(int x1, int y1, int x2, int y2)
             y1 += signY;
         }
     }
-    return line;
+    //return line;
 }
 
 void QVPLine::update()
@@ -66,10 +68,11 @@ void QVPLine::update()
     }
 
     drawLine(color);
+
     if (m_rasterized){
         delete m_rasterized;
     }
-    m_rasterized = new QVPRasterizedShape;
+    m_rasterized = new QVPRasterizedShape(m_shapePoints, color, 2);
 }
 
 void QVPLine::drawLine(QColor color)
@@ -81,12 +84,13 @@ void QVPLine::drawLine(QColor color)
     painter.setPen(pen);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    QVector<QPoint> vec = bresenham_line(
+    m_shapePoints->clear();
+    bresenham_line(*m_shapePoints,
                 m_firstPoint.x(), m_firstPoint.y(),
                 m_lastPoint.x(), m_lastPoint.y());
 
     //painter.drawPolyline(vec.data(), vec.size());
-    painter.drawPoints(vec.data(), vec.size());
+    painter.drawPoints(m_shapePoints->data(), m_shapePoints->size());
 
     if (m_selected){
         pen.setWidth(10);

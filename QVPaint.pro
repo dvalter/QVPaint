@@ -23,6 +23,7 @@ SOURCES += \
         qvpmainwindow.cpp \
     qvpdocument.cpp \
     qvpshape.cpp \
+    qvpdot.cpp \
     qvpline.cpp \
     qvpellipse.cpp \
     qvpellipticarc.cpp \
@@ -35,6 +36,7 @@ HEADERS += \
     qvpdocument.h \
     qvpshape.h \
     config.h \
+    qvpdot.h \
     qvpline.h \
     qvpellipse.h \
     qvpellipticarc.h \

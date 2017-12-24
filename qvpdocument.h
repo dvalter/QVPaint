@@ -4,6 +4,7 @@
 #include <QtWidgets>
 #include <qvpshape.h>
 #include "config.h"
+#include "qvpdot.h"
 #include "qvpline.h"
 #include "qvpellipse.h"
 #include "qvpellipticarc.h"

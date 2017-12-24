@@ -19,7 +19,7 @@ public:
     virtual void handleMousePressEvent(QMouseEvent * me) override;
     virtual void handleMouseReleaseEvent(QMouseEvent * me) override;
     virtual bool isReady() override { return m_state > 4; }
-    virtual QVPRasterizedShape& getRasterized() {return *(new QVPRasterizedShape());}
+    virtual QVPRasterizedShape& getRasterized() { return *m_rasterized; }
     virtual QString toString() override;
 
 protected:
@@ -34,7 +34,7 @@ private:
     inline float sin(QPointF point);
     inline float cos(QPointF point);
     inline void appendPoint(QPoint point, QVector<QPoint>& vec);
-    QVector<QPoint> bresenham_elliptic_arc(int x, int y, int a, int b);
+    void bresenham_elliptic_arc(QVector<QPoint> &ellipse, int x, int y, int a, int b);
     inline void initEllipseParams();
 
     QPointF m_center;

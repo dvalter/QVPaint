@@ -25,12 +25,12 @@ QVPEllipse::QVPEllipse(QObject * parent):
 
 
 
-QVector<QPoint> bresenham_ellipse(int x, int y, int a, int b)
+void bresenham_ellipse(QVector<QPoint>& ellipse, int x, int y, int a, int b)
 {
-    QVector<QPoint> ellipse;
+//    QVector<QPoint> ellipse;
     if (!a && !b){
         ellipse.append(QPoint(x,y));
-        return ellipse;
+        return;
     }
 //    int col,row;
 //    long a_square,b_square,two_a_square,two_b_square,four_a_square,four_b_square,d;
@@ -100,7 +100,7 @@ QVector<QPoint> bresenham_ellipse(int x, int y, int a, int b)
         d += two_a_square*(3-(row <<1));
     }*/
 
-    return ellipse;
+//    return ellipse;
 }
 
 
@@ -118,6 +118,10 @@ void QVPEllipse::update()
     }
 
     drawEllipse(color);
+    if (m_rasterized != nullptr){
+        delete m_rasterized;
+    }
+    m_rasterized = new QVPRasterizedShape(m_shapePoints, color, 2);
 }
 
 void QVPEllipse::drawEllipse(QColor color)
@@ -128,10 +132,11 @@ void QVPEllipse::drawEllipse(QColor color)
     painter.setPen(pen);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setBrush(QBrush(Qt::NoBrush));
-    QVector<QPoint> vec = bresenham_ellipse(
+    m_shapePoints->clear();
+    bresenham_ellipse(*m_shapePoints,
                 m_center.x(), m_center.y(), m_a, m_b);
 
-    painter.drawPoints(vec.data(), vec.size());
+    painter.drawPoints(m_shapePoints->data(), m_shapePoints->size());
 
 
     if (m_selected){

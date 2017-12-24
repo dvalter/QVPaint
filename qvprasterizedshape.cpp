@@ -22,6 +22,9 @@ void QVPRasterizedShape::operator ()(QImage * image) const
     if (!m_points)
         return;
     QPainter painter(image);
+    for (auto p : *m_points){
+        qDebug() << p;
+    }
     painter.setPen(m_pen);
     painter.drawPoints(m_points->data(), m_points->size());
     if(m_keyPoints){
