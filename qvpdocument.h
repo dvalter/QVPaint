@@ -15,22 +15,26 @@ class QVPDocument : public QLabel
     Q_OBJECT
 public:
     explicit QVPDocument(QWidget* parent = nullptr);
-    bool saveToFile(QString fileName);
+    bool saveToFile(const QString& fileName);
+    bool loadFromFile(const QString& fileName);
 
 public slots:
     void setEditorMode(QVP::editorMode em);
 
 private:
     QList<QVPShape*> m_shapesList;
+    QList<QVPShape*> m_selectedShapesList;
     QVPShape* m_tmpShape = nullptr;
     QImage* m_mainImage;
     QLabel* m_imgLbl;
     qint8 m_counter = 0;
     QVP::editorMode m_currentMode = QVP::drawLine;
 
+    void unSelect();
+    void parseString(QString inStr);
     void updateImage();
     void searchPixel(QPoint);
-    int checkPixel(QPoint);
+//    int checkPixel(QPoint);
 
 
 protected:
@@ -41,6 +45,7 @@ protected:
 
 signals:
     void updateCoord(QPoint coord);
+    void shapeSelected(bool state);
 
 };
 

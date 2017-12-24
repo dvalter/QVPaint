@@ -1,9 +1,13 @@
 <RCC>
     <qresource prefix="/">
         <file alias="Selection.svg">imgs/cursor-arrow.svg</file>
-        <file alias="Cross.svg">imgs/draw-cross.svg</file>
+        <file alias="Orthogonal line.svg">imgs/orthogonal.svg</file>
+        <file alias="Clip with rectangle.svg">imgs/cut-rectangular.svg</file>
+        <file alias="Cut with line.svg">imgs/cut-line.svg</file>
+        <file alias="Set up shape.svg">imgs/shape-params.svg</file>
         <file alias="Ellipse.svg">imgs/draw-ellipse.svg</file>
-        <file alias="Elliptic Curve.svg">imgs/draw-ellipse-part.svg</file>
+        <file alias="Move.svg">imgs/move.svg</file>
+        <file alias="Elliptic curve.svg">imgs/draw-arc.svg</file>
         <file alias="Line.svg">imgs/draw-line.svg</file>
         <file alias="Dot.svg">imgs/edit-map.svg</file>
     </qresource>

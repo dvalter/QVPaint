@@ -10,6 +10,8 @@ class QVPAction : public QAction
 public:
     QVPAction(const QIcon &icon, const QString &label, const QVP::editorMode mode, QObject *parent=nullptr);
 
+public slots:
+    void enable(bool state);
 
 signals:
     void toggled(QVP::editorMode mode);

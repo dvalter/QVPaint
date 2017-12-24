@@ -14,3 +14,8 @@ void QVPAction::slotToggled(bool state)
         emit toggled(m_mode);
     }
 }
+
+void QVPAction::enable(bool state)
+{
+    QAction::setEnabled(state);
+}

@@ -14,21 +14,19 @@ public:
     explicit QVPEllipticArc(QObject *parent = nullptr);
     QVPEllipticArc(QObject *parent, QColor penColor);
     QVPEllipticArc(QColor penColor);
-    QVPEllipticArc(QObject *parent, QColor penColor, QPointF center, float a, float b, float a1, float a2);
+    QVPEllipticArc(QObject *parent, QColor penColor, QPointF center, float a, float b, float a1, float a2, int width = 1);
     virtual void handleMouseMoveEvent(QMouseEvent * me) override;
     virtual void handleMousePressEvent(QMouseEvent * me) override;
     virtual void handleMouseReleaseEvent(QMouseEvent * me) override;
     virtual bool isReady() override { return m_state > 4; }
     virtual QVPRasterizedShape& getRasterized() { return *m_rasterized; }
     virtual QString toString() override;
+    virtual void move(QPointF vec) override;
 
 protected:
     virtual void update() override;
 
 private:
-    void drawEllipse(QColor color);
-    void drawLine(QColor color);
-    void drawLine(QColor color, QPointF point);
     inline bool checkPoint(QPoint point);
 
     inline float sin(QPointF point);

@@ -23,6 +23,13 @@ QVPLine::QVPLine(QObject * parent):
 
 }
 
+QVPLine::QVPLine(QObject *parent, QColor penColor, QPointF first, QPointF last, int width):
+    QVPShape(parent, penColor, width),
+    m_firstPoint(first),
+    m_lastPoint(last)
+{
+    update();
+}
 
 void bresenham_line(QVector<QPoint>& line, int x1, int y1, int x2, int y2)
 {
@@ -63,11 +70,15 @@ void QVPLine::update()
         if (color == QVP::backgroundColor){
             color = QColor(0xFF, 0x0, 0x0, 0xFF); // shoud be red
         }
+        qDebug() << color;
     } else {
         color = m_penColor;
     }
 
-    drawLine(color);
+    m_shapePoints->clear();
+    bresenham_line(*m_shapePoints,
+                m_firstPoint.x(), m_firstPoint.y(),
+                m_lastPoint.x(), m_lastPoint.y());
 
     if (m_rasterized){
         delete m_rasterized;
@@ -75,31 +86,7 @@ void QVPLine::update()
     m_rasterized = new QVPRasterizedShape(m_shapePoints, color, 2);
 }
 
-void QVPLine::drawLine(QColor color)
-{
-//    m_image->fill(QColor(0x00, 0x00, 0x00, 0x00));
-//    QPainter painter(m_image);
-//    QPen pen(color);
-//    pen.setWidth(1);
-//    painter.setPen(pen);
-//    painter.setRenderHint(QPainter::Antialiasing, true);
 
-    m_shapePoints->clear();
-    bresenham_line(*m_shapePoints,
-                m_firstPoint.x(), m_firstPoint.y(),
-                m_lastPoint.x(), m_lastPoint.y());
-
-    //painter.drawPolyline(vec.data(), vec.size());
-//    painter.drawPoints(m_shapePoints->data(), m_shapePoints->size());
-
-//    if (m_selected){
-//        pen.setWidth(10);
-//        pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
-//        painter.setPen(pen);
-//        painter.drawPoint(m_firstPoint);
-//        painter.drawPoint(m_lastPoint);
-//    }
-}
 
 void QVPLine::handleMousePressEvent(QMouseEvent * me)
 {
@@ -136,6 +123,18 @@ QString QVPLine::toString()
 {
     std::stringstream ss;
     ss << "L;" << m_firstPoint.x() << ";" << m_firstPoint.y() << ";" <<
-              m_lastPoint.x() << ";" << m_lastPoint.y() << ";\n";
+          m_lastPoint.x() << ";" << m_lastPoint.y() << ";" <<
+          QString("%1%2%3").arg(m_penColor.red() / 0x10, 0, 16)
+          .arg(m_penColor.green() / 0x10, 0, 16)
+          .arg(m_penColor.blue() / 0x10, 0, 16).toStdString() << ";" << m_width << "\n";
     return QString::fromStdString(std::string(ss.str()));
+}
+
+void QVPLine::move(QPointF vec)
+{
+    m_firstPoint.rx() += vec.x();
+    m_firstPoint.ry() += vec.y();
+    m_lastPoint.rx() += vec.x();
+    m_lastPoint.ry() += vec.y();
+    update();
 }

@@ -22,6 +22,14 @@ QVPDot::QVPDot(QObject * parent):
 }
 
 
+QVPDot::QVPDot(QObject *parent, QColor penColor, QPointF point, int width):
+    QVPShape(parent, penColor, width),
+    m_firstPoint(point)
+{
+    m_shapePoints->push_back(QPoint());
+    update();
+}
+
 
 void QVPDot::update()
 {
@@ -31,11 +39,11 @@ void QVPDot::update()
         if (color == QVP::backgroundColor){
             color = QColor(0xFF, 0x0, 0x0, 0xFF); // shoud be red
         }
+        qDebug() << color;
     } else {
         color = m_penColor;
     }
 
-    drawDot(color);
 
     if (m_rasterized){
         delete m_rasterized;
@@ -44,22 +52,7 @@ void QVPDot::update()
     m_rasterized = new QVPRasterizedShape(m_shapePoints, color, 2);
 }
 
-void QVPDot::drawDot(QColor color)
-{
-//    m_image->fill(QColor(0x00, 0x00, 0x00, 0x00));
-//    QPainter painter(m_image);
-//    QPen pen(color);
-//    pen.setWidth(1);
-//    painter.setPen(pen);
-//    painter.setRenderHint(QPainter::Antialiasing, true);
 
-//    if (m_selected){
-//        pen.setWidth(10);
-//        pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
-//        painter.setPen(pen);
-//    }
-//    painter.drawPoint(m_firstPoint);
-}
 
 void QVPDot::handleMousePressEvent(QMouseEvent * me)
 {
@@ -94,6 +87,16 @@ QVPRasterizedShape& QVPDot::getRasterized()
 QString QVPDot::toString()
 {
     std::stringstream ss;
-    ss << "D;" << m_firstPoint.x() << ";" << m_firstPoint.y() << ";\n";
+    ss << "D;" << m_firstPoint.x() << ";" << m_firstPoint.y() << ";" <<
+          QString("%1%2%3").arg(m_penColor.red() / 0x10, 0, 16)
+          .arg(m_penColor.green() / 0x10, 0, 16)
+          .arg(m_penColor.blue() / 0x10, 0, 16).toStdString() << ";" << m_width << "\n";
     return QString::fromStdString(std::string(ss.str()));
+}
+
+void QVPDot::move(QPointF vec)
+{
+    m_firstPoint.rx() += vec.x();
+    m_firstPoint.ry() += vec.y();
+    update();
 }

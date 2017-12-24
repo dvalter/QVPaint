@@ -26,8 +26,8 @@ QVPEllipticArc::QVPEllipticArc(QObject * parent):
 }
 
 QVPEllipticArc::QVPEllipticArc(QObject *parent, QColor penColor, QPointF center,
-                               float a, float b, float a1, float a2):
-    QVPShape(parent, penColor),
+                               float a, float b, float a1, float a2, int width):
+    QVPShape(parent, penColor, width),
     m_center(center),
     m_a(a),
     m_b(b),
@@ -108,17 +108,26 @@ void QVPEllipticArc::update()
         if (color == QVP::backgroundColor){
             color = QColor(0xFF, 0x0, 0x0, 0xFF); // shoud be red
         }
+        qDebug() << color;
     } else {
         color = m_penColor;
     }
 
-    drawEllipse(color);
+    m_shapePoints->clear();
+    bresenham_elliptic_arc(*m_shapePoints,
+                m_center.x(), m_center.y(), m_a, m_b);
 
     if (m_state == 2 || m_state == 3){
-        drawLine(color, m_firstPoint);
+        bresenham_line(*m_shapePoints,
+                    m_center.x(), m_center.y(),
+                    m_firstPoint.x(), m_firstPoint.y());
     } elif (m_state == 4){
-        drawLine(color, m_firstPoint);
-        drawLine(color, m_lastPoint);
+        bresenham_line(*m_shapePoints,
+                    m_center.x(), m_center.y(),
+                    m_firstPoint.x(), m_firstPoint.y());
+        bresenham_line(*m_shapePoints,
+                    m_center.x(), m_center.y(),
+                    m_lastPoint.x(), m_lastPoint.y());
     }
 
     if (m_rasterized != nullptr){
@@ -127,53 +136,9 @@ void QVPEllipticArc::update()
     m_rasterized = new QVPRasterizedShape(m_shapePoints, color, 2);
 }
 
-void QVPEllipticArc::drawEllipse(QColor color)
-{
-//    m_image->fill(QColor(0x00, 0x00, 0x00, 0x00));
-//    //m_image->fill(QColor(0x00, 0x00, 0x00, 0xFF));
-//    QPainter painter(m_image);
-//    QPen pen(color);
-//    painter.setPen(pen);
-//    painter.setRenderHint(QPainter::Antialiasing, true);
-//    painter.setBrush(QBrush(Qt::NoBrush));
-
-    m_shapePoints->clear();
-    bresenham_elliptic_arc(*m_shapePoints,
-                m_center.x(), m_center.y(), m_a, m_b);
-
-//    painter.drawPoints(m_shapePoints->data(), m_shapePoints->size());
-
-
-//    if (m_selected){
-//        pen.setWidth(10);
-//        pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
-//        painter.setPen(pen);
-//        painter.drawPoint(m_center);
-//        pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
-//        painter.setPen(pen);
-//        painter.drawPoint(QPoint(m_center.x() + m_a, m_center.y() + m_b));
-//        painter.drawPoint(QPoint(m_center.x() - m_a, m_center.y() - m_b));
-//        painter.drawPoint(QPoint(m_center.x() + m_a, m_center.y() - m_b));
-//        painter.drawPoint(QPoint(m_center.x() - m_a, m_center.y() + m_b));
-//    }
-}
 
 
 
-void QVPEllipticArc::drawLine(QColor color, QPointF point){
-//    QPainter painter(m_image);
-//    QPen pen(color);
-//    pen.setWidth(1);
-//    painter.setPen(pen);
-//    painter.setRenderHint(QPainter::Antialiasing, true);
-
-    bresenham_line(*m_shapePoints,
-                m_center.x(), m_center.y(),
-                point.x(), point.y());
-
-
-//    painter.drawPoints(m_shapePoints->data(), m_shapePoints->size());
-}
 
 
 
@@ -330,6 +295,16 @@ QString QVPEllipticArc::toString()
 {
     std::stringstream ss;
     ss << "A;" << m_center.x() << ";" << m_center.y() << ";" <<
-              m_a << ";" << m_b << ";" << m_ang1 << ";" << m_ang2 << ";\n";
+          m_a << ";" << m_b << ";" << m_ang1 << ";" << m_ang2 << ";" <<
+          QString("%1%2%3").arg(m_penColor.red() / 0x10, 0, 16)
+          .arg(m_penColor.green() / 0x10, 0, 16)
+          .arg(m_penColor.blue() / 0x10, 0, 16).toStdString() << ";" << m_width << "\n";
     return QString::fromStdString(std::string(ss.str()));
+}
+
+void QVPEllipticArc::move(QPointF vec)
+{
+    m_center.rx() += vec.x();
+    m_center.ry() += vec.y();
+    update();
 }

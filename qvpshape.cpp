@@ -1,16 +1,16 @@
 #include "qvpshape.h"
 
-QVPShape::QVPShape(QObject *parent, QColor penColor) :
+QVPShape::QVPShape(QObject *parent, QColor penColor, int width) :
     QObject(parent),
-    m_penColor(penColor)/*,
-    m_image(new QImage(QVP::imageWigth, QVP::imageHeight, QImage::Format_ARGB32_Premultiplied))*/
+    m_penColor(penColor),
+    m_width(width)
 {
 
 }
 
-const QImage& QVPShape::getImage()
+QVPShape::~QVPShape()
 {
-//    return *m_image;
+    delete m_shapePoints;
 }
 
 void QVPShape::select(bool state)

@@ -67,7 +67,12 @@ void QVPMainWindow::initToolsList()
     m_toolsList.append(QVPToolPair(QVP::drawDot, "Dot"));
     m_toolsList.append(QVPToolPair(QVP::drawLine, "Line"));
     m_toolsList.append(QVPToolPair(QVP::drawEllipse, "Ellipse"));
-    m_toolsList.append(QVPToolPair(QVP::drawEllipticCurve, "Elliptic Curve"));
+    m_toolsList.append(QVPToolPair(QVP::drawEllipticCurve, "Elliptic curve"));
+    m_toolsList.append(QVPToolPair(QVP::move, "Move"));
+    m_toolsList.append(QVPToolPair(QVP::makeOrtho, "Orthogonal line"));
+    m_toolsList.append(QVPToolPair(QVP::crossLine, "Cut with line"));
+    m_toolsList.append(QVPToolPair(QVP::clipRectangle, "Clip with rectangle"));
+    m_toolsList.append(QVPToolPair(QVP::setUp, "Set up shape"));
 }
 
 void QVPMainWindow::initToolbar(QToolBar * toolBar, QList<QVPToolPair > elements, Qt::ToolBarArea area)
@@ -80,6 +85,7 @@ void QVPMainWindow::initToolbar(QToolBar * toolBar, QList<QVPToolPair > elements
 
     QMenu *const toolMenu = menuBar()->addMenu("&Tools");
 
+    int counter = 0;
     for (QVPToolPair mode : elements){
         QVPAction* act = new QVPAction(QPixmap(":/" + mode.second + ".svg"), mode.second, mode.first);
         act->setCheckable(true);
@@ -94,7 +100,14 @@ void QVPMainWindow::initToolbar(QToolBar * toolBar, QList<QVPToolPair > elements
         if (mode.first == QVP::selectShape){
             act->setChecked(true);
         }
+
+        if (counter > 4){
+            QObject::connect(m_mainDocument, &QVPDocument::shapeSelected, act, &QVPAction::enable);
+        }
+        counter++;
     }
+
+//    emit shapeSelected(false);
 
     m_toolActionGroup->setExclusive(true);
 
@@ -123,7 +136,7 @@ void QVPMainWindow::open()
         QFileDialog::getOpenFileName(
                 this, "Open File", QDir::currentPath());
     if (!fileName.isEmpty()) {
-        qCritical() << "NOT IMPLEMENTED OPEN FILE!";
+        m_mainDocument->loadFromFile(fileName);
     }
 }
 

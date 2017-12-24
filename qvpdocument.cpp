@@ -2,8 +2,11 @@
 #include <QPainter>
 #include <QDebug>
 #include <stdlib.h>
+//#include <fstream>
+//#include <regex>
+//#include <iostream>
 
-
+QColor colorFrom8BitStr(QString str);
 
 
 QVPDocument::QVPDocument(QWidget* parent) :
@@ -16,55 +19,11 @@ QVPDocument::QVPDocument(QWidget* parent) :
     resize(QVP::imageWigth, QVP::imageHeight);
 
     setMouseTracking(true);
-
-    m_shapesList.append(new QVPEllipticArc(this, QVP::penColor, QPointF(100, 100), 50.0, 50.0, -M_PI_2, M_PI_2));
-    update();
+    emit shapeSelected(false);
+//    m_shapesList.append(new QVPEllipticArc(this, QVP::penColor, QPointF(100, 100), 50.0, 50.0, -M_PI_2, M_PI_2));
+//    update();
 }
 
-//void QVPDocument::searchPixel(QPoint point)
-//{
-//    if (-1 != checkPixel(point))
-//        return;
-//    int x = point.x();
-//    int y = point.y();
-//    for(int i = 0; i < QVP::searchWidth; i++){
-//        for(int j = 0; j < i + 2; j++){
-//            int xDelta = j;
-//            int yDelta = i - j + 1;
-//            if (-1 != checkPixel(QPoint(x + xDelta, y + yDelta)))
-//                return;
-//            if (-1 != checkPixel(QPoint(x - xDelta, y + yDelta)))
-//                return;
-//            if (-1 != checkPixel(QPoint(x + xDelta, y - yDelta)))
-//                return;
-//            if (-1 != checkPixel(QPoint(x - xDelta, y - yDelta)))
-//                return;
-//        }
-//    }
-//}
-
-int QVPDocument::checkPixel(QPoint point){
-
-//    m_mainImage->setPixelColor(point, Qt::blue);
-//    update(m_mainImage->rect());
-
-    int counter = 0;
-    for(QVPShape* shape : m_shapesList){
-        if (qAlpha(shape->getImage().pixel(point.x(), point.y())) != 0x00){
-            shape->select(true);
-            qDebug()  << shape->metaObject()->className();
-            return counter;
-        } else {
-            shape->select(false);
-        }
-        counter++;
-    }
-    if (counter >= m_shapesList.size()){
-        return -1;
-    } else {
-        return -2;
-    }
-}
 
 void QVPDocument::searchPixel(QPoint point)
 {
@@ -75,12 +34,14 @@ void QVPDocument::searchPixel(QPoint point)
         if (dist < minDist){
             selectedShape = shape;
             minDist = dist;
-        } else {
+        } /*else {
             shape->select(false);
-        }
+        }*/
     }
     if (selectedShape){
         selectedShape->select(true);
+        m_selectedShapesList.append(selectedShape);
+        emit shapeSelected(true);
     }
     update();
 }
@@ -93,7 +54,7 @@ void QVPDocument::mousePressEvent(QMouseEvent* me)
             m_tmpShape = new QVPDot(this);
             m_tmpShape->handleMousePressEvent(me);
             updateImage();
-        } elif (m_currentMode == QVP::drawLine){
+        } elif (m_currentMode == QVP::drawLine || m_currentMode == QVP::move){
             m_tmpShape = new QVPLine(this);
             m_tmpShape->handleMousePressEvent(me);
             updateImage();
@@ -119,12 +80,11 @@ void QVPDocument::mousePressEvent(QMouseEvent* me)
 
 void QVPDocument::mouseMoveEvent(QMouseEvent *me)
 {
-    //Debug() << __FUNCTION__ << me;
 
     emit updateCoord(me->pos());
 
     if (m_currentMode == QVP::drawLine || m_currentMode == QVP::drawEllipse
-            || m_currentMode == QVP::drawDot){
+            || m_currentMode == QVP::drawDot || m_currentMode == QVP::move){
         if (me->buttons() & Qt::LeftButton){
             m_tmpShape->handleMouseMoveEvent(me);
         }
@@ -138,7 +98,6 @@ void QVPDocument::mouseMoveEvent(QMouseEvent *me)
 
 void QVPDocument::mouseReleaseEvent(QMouseEvent *me)
 {
-//    qDebug() << __FUNCTION__ << me;
     if (m_currentMode == QVP::drawLine  || m_currentMode == QVP::drawEllipse
             || m_currentMode == QVP::drawDot){
         if (me->button() == Qt::LeftButton){
@@ -156,15 +115,22 @@ void QVPDocument::mouseReleaseEvent(QMouseEvent *me)
             }
         }
         updateImage();
+    } elif (m_currentMode == QVP::move){
+        QVPLine* linePtr = qobject_cast<QVPLine *>(m_tmpShape);
+        QPointF a = linePtr->getFirst();
+        QPointF b = linePtr->getLast();
+        QPointF vec(b.x() - a.x(), b.y() - a.y());
+        for (auto shape : m_selectedShapesList){
+            shape->move(vec);
+        }
+        delete m_tmpShape;
+        m_tmpShape = nullptr;
+        updateImage();
     }
 }
 
 void QVPDocument::paintEvent(QPaintEvent *event)
 {
-//    qDebug() << event;
-
-
-//    qDebug() << m_mainImage;
     const QRect paintRect = event->rect();
 
     QPainter painter(this);
@@ -181,7 +147,35 @@ void QVPDocument::paintEvent(QPaintEvent *event)
 void QVPDocument::setEditorMode(QVP::editorMode em)
 {
     qDebug() << __FUNCTION__;
+    if ((m_currentMode == QVP::selectShape &&
+            !(em == QVP::move || em == QVP::makeOrtho ||
+             em == QVP::clipRectangle || em == QVP::crossLine ||
+             em == QVP::setUp)) ||
+            (m_currentMode == QVP::move ||
+             m_currentMode == QVP::makeOrtho ||
+             m_currentMode == QVP::clipRectangle ||
+             m_currentMode == QVP::crossLine ||
+             m_currentMode == QVP::setUp)){
+        unSelect();
+    }
     m_currentMode = em;
+
+    if (m_tmpShape) {
+        delete m_tmpShape;
+        m_tmpShape = nullptr;
+    }
+    updateImage();
+
+
+}
+
+void QVPDocument::unSelect()
+{
+    for (auto shape : m_selectedShapesList){
+        shape->select(false);
+    }
+    m_selectedShapesList.clear();
+    emit shapeSelected(false);
 }
 
 void QVPDocument::updateImage()
@@ -197,38 +191,86 @@ void QVPDocument::updateImage()
     update(m_mainImage->rect());
 }
 
-//void QVPDocument::updateImageOld()
-//{
-//    QPainter pm(m_mainImage);
+void QVPDocument::parseString(QString inStr)
+{
+    QStringList inList = inStr.split(';');
+    qDebug() << inList;
 
-//    QImage background(m_mainImage->size(), m_mainImage->format());
-//    background.fill(QVP::backgroundColor);
+    if (inList[0] == "D"){
+        QColor color(colorFrom8BitStr(inList[3]));
+        QPointF point(inList[1].toFloat(), inList[2].toFloat());
+        int width  = inList[4].toInt();
+        m_shapesList.append(new QVPDot(this, color, point, width));
+    } elif (inList[0] == "L"){
+        QColor color(colorFrom8BitStr(inList[5]));
+        QPointF first(inList[1].toFloat(), inList[2].toFloat());
+        QPointF last(inList[3].toFloat(), inList[4].toFloat());
+        int width  = inList[6].toInt();
+        m_shapesList.append(new QVPLine(this, color, first, last, width));
+    } elif (inList[0] == "E"){
+        QColor color(colorFrom8BitStr(inList[5]));
+        QPointF center(inList[1].toFloat(), inList[2].toFloat());
+        float a = inList[3].toFloat();
+        float b = inList[4].toFloat();
+        int width  = inList[6].toInt();
+        m_shapesList.append(new QVPEllipse(this, color, center, a, b, width));
+    } elif (inList[0] == "A"){
+        QColor color(colorFrom8BitStr(inList[7]));
+        QPointF center(inList[1].toFloat(), inList[2].toFloat());
+        float a = inList[3].toFloat();
+        float b = inList[4].toFloat();
+        float ang1 = inList[5].toFloat();
+        float ang2 = inList[6].toFloat();
+        int width  = inList[8].toInt();
+        m_shapesList.append(new QVPEllipticArc(this, color, center, a, b, ang1, ang2, width));
+    } else {
+        qWarning() << "BAD LINE";
+    }
+}
 
-//    pm.setCompositionMode(QPainter::CompositionMode_Source);
-//    pm.fillRect(m_mainImage->rect(), Qt::transparent);
+QColor colorFrom8BitStr(QString str)
+{
+    qDebug() << str;
 
-//    pm.setCompositionMode(QPainter::CompositionMode_SourceOver);
-//    pm.drawImage(0,0, background);
+    if (str.length() > 3){
+        throw std::runtime_error("bad color");
+    }
 
-//    for(auto shape : m_shapesList){
-//        pm.drawImage(0,0, shape->getImage());
+    std::string sstr = str.toLower().toStdString();
 
-//    }
+    quint8 red =    str[0] != '0' ? ((sstr[0] > '9' ? sstr[0] - 'a' + 0xA : sstr[0] - '0') << 4) + 0xF  : 0x00;
+    quint8 green =  str[1] != '0' ? ((sstr[1] > '9' ? sstr[1] - 'a' + 0xA : sstr[1] - '0') << 4) + 0xF  : 0x00;
+    quint8 blue =   str[2] != '0' ? ((sstr[2] > '9' ? sstr[2] - 'a' + 0xA : sstr[2] - '0') << 4) + 0xF  : 0x00;
 
-//    if (m_tmpShape != nullptr){
-//        pm.drawImage(0,0, m_tmpShape->getImage());
+    qDebug() << QString("%1.%2.%3").arg(red , 0, 16).arg(green , 0, 16).arg(blue , 0, 16);
+    return QColor(red, green, blue, 0xFF);
+}
 
-//    }
-//    pm.end();
-
-//    update(m_mainImage->rect());
-//}
-
-bool QVPDocument::saveToFile(QString fileName)
+bool QVPDocument::loadFromFile(const QString& fileName)
 {
     bool status;
     QFile file(fileName);
-    if ((status = file.open(QIODevice::ReadWrite))) {
+    if ((status = file.open(QIODevice::ReadOnly))) {
+        QTextStream stream(&file);
+
+        while(!m_shapesList.empty()){
+            delete m_shapesList.takeLast();
+        }
+        m_shapesList.clear();
+
+        while(!stream.atEnd()){
+            parseString(stream.readLine());
+        }
+        updateImage();
+    }
+    return status;
+}
+
+bool QVPDocument::saveToFile(const QString& fileName)
+{
+    bool status;
+    QFile file(fileName);
+    if ((status = file.open(QIODevice::WriteOnly))) {
         QTextStream stream(&file);
         for (QVPShape* shape : m_shapesList){
                stream << shape->toString();

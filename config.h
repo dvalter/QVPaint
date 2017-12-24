@@ -19,7 +19,12 @@ namespace QVP
         drawDot,
         drawEllipse,
         drawEllipticCurve,
-        selectShape
+        selectShape,
+        move,
+        crossLine,
+        clipRectangle,
+        makeOrtho,
+        setUp
     };
 
     // default bg color

@@ -25,8 +25,7 @@ public slots:
     void open();
     void save();
 
-//signals:
-//    void updateCoord(QPoint coord);
+
 
 private:
     QScrollArea* m_scrollArea;

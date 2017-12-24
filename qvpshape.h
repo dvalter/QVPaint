@@ -10,8 +10,7 @@ class QVPShape : public QObject
 {
     Q_OBJECT
 public:
-    explicit QVPShape(QObject *parent = nullptr, QColor penColor = QVP::penColor);
-    const QImage& getImage();
+    explicit QVPShape(QObject *parent = nullptr, QColor penColor = QVP::penColor, int width=1);
     virtual void handleMousePressEvent(QMouseEvent * me) = 0;
     virtual void handleMouseMoveEvent(QMouseEvent * me) = 0;
     virtual void handleMouseReleaseEvent(QMouseEvent * me) = 0;
@@ -21,7 +20,10 @@ public:
     int testPoint(QPoint point);
     virtual QVPRasterizedShape& getRasterized() = 0;
     virtual QString toString() = 0;
+    virtual void move(QPointF vec) = 0;
 
+
+    ~QVPShape();
 signals:
 
 public slots:
@@ -38,6 +40,7 @@ protected:
     bool m_mousePressed = false;
     bool m_selected = false;
     QVPRasterizedShape* m_rasterized = new QVPRasterizedShape;
+    int m_width = 1;
 
 
 };

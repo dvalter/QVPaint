@@ -21,7 +21,15 @@ QVPEllipse::QVPEllipse(QObject * parent):
 
 }
 
-
+QVPEllipse::QVPEllipse(QObject *parent, QColor penColor, QPointF center,
+                               float a, float b, int width):
+    QVPShape(parent, penColor, width),
+    m_center(center),
+    m_a(a),
+    m_b(b)
+{
+    update();
+}
 
 
 
@@ -113,62 +121,36 @@ void QVPEllipse::update()
         if (color == QVP::backgroundColor){
             color = QColor(0xFF, 0x0, 0x0, 0xFF); // shoud be red
         }
+        qDebug() << color;
     } else {
         color = m_penColor;
     }
 
-    drawEllipse(color);
+    m_shapePoints->clear();
+    bresenham_ellipse(*m_shapePoints,
+                m_center.x(), m_center.y(), m_a, m_b);
+
     if (m_rasterized != nullptr){
         delete m_rasterized;
     }
     m_rasterized = new QVPRasterizedShape(m_shapePoints, color, 2);
 }
 
-void QVPEllipse::drawEllipse(QColor color)
-{
-//    m_image->fill(QColor(0x00, 0x00, 0x00, 0x00));
-//    QPainter painter(m_image);
-//    QPen pen(color);
-//    painter.setPen(pen);
-//    painter.setRenderHint(QPainter::Antialiasing, true);
-//    painter.setBrush(QBrush(Qt::NoBrush));
-    m_shapePoints->clear();
-    bresenham_ellipse(*m_shapePoints,
-                m_center.x(), m_center.y(), m_a, m_b);
 
-//    painter.drawPoints(m_shapePoints->data(), m_shapePoints->size());
-
-
-//    if (m_selected){
-//        pen.setWidth(10);
-//        pen.setColor(QColor(0xFF, 0x00, 0x0, 0xFF));
-//        painter.setPen(pen);
-//        painter.drawPoint(m_center);
-//        //painter.end();
-//        pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
-//        painter.setPen(pen);
-//        painter.drawPoint(QPoint(m_center.x() + m_a, m_center.y() + m_b));
-//        painter.drawPoint(QPoint(m_center.x() - m_a, m_center.y() - m_b));
-//        painter.drawPoint(QPoint(m_center.x() + m_a, m_center.y() - m_b));
-//        painter.drawPoint(QPoint(m_center.x() - m_a, m_center.y() + m_b));
-//    }
-}
 
 void QVPEllipse::handleMousePressEvent(QMouseEvent * me)
 {
-    //qDebug() << __FILE__ << ":" << __FUNCTION__;
     m_firstPoint = me->pos();
     m_lastPoint = me->pos();
     m_center = m_firstPoint;
     m_a = 0;
     m_b = 0;
     m_mousePressed = true;
-    //update();
+    update();
 }
 
 void QVPEllipse::handleMouseMoveEvent(QMouseEvent * me)
 {
-    //qDebug() << __FILE__ << ":" << __FUNCTION__;
     m_lastPoint = me->pos();
     initEllipseParams();
     update();
@@ -178,7 +160,6 @@ void QVPEllipse::handleMouseMoveEvent(QMouseEvent * me)
 
 void QVPEllipse::handleMouseReleaseEvent(QMouseEvent * me)
 {
-    //qDebug() << __FILE__ << ":" << __FUNCTION__;
     m_lastPoint = me->pos();
     initEllipseParams();
     m_mousePressed = false;
@@ -195,7 +176,16 @@ QString QVPEllipse::toString()
 {
     std::stringstream ss;
     ss << "E;" << m_center.x() << ";" << m_center.y() << ";" <<
-              m_a << ";" << m_b << ";\n";
+          m_a << ";" << m_b << ";" <<
+          QString("%1%2%3").arg(m_penColor.red() / 0x10, 0, 16)
+          .arg(m_penColor.green() / 0x10, 0, 16)
+          .arg(m_penColor.blue() / 0x10, 0, 16).toStdString() << ";" << m_width << "\n";
     return QString::fromStdString(std::string(ss.str()));
 }
 
+void QVPEllipse::move(QPointF vec)
+{
+    m_center.rx() += vec.x();
+    m_center.ry() += vec.y();
+    update();
+}
