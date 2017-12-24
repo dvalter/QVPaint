@@ -14,14 +14,8 @@ QVPDocument::QVPDocument(QWidget* parent) :
 
     setMouseTracking(true);
 
-//    m_imgLbl->setBackgroundRole(QPalette::Base);
-//    m_imgLbl->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-//    m_imgLbl->setScaledContents(true);
-//    m_imgLbl->setPixmap(QPixmap::fromImage(*m_mainImage));
-//    m_currentMode = QVP::selectShape;
-
-
-//    srand((quint64)this);
+    m_shapesList.append(new QVPEllipticArc(this, QVP::penColor, QPointF(100, 100), 50.0, 50.0, -M_PI_2, M_PI_2));
+    update();
 }
 
 void QVPDocument::mousePressEvent(QMouseEvent* me)
@@ -29,16 +23,16 @@ void QVPDocument::mousePressEvent(QMouseEvent* me)
     qDebug() << __FUNCTION__ << me;
     if (me->button() == Qt::LeftButton){
         if (m_currentMode == QVP::drawLine){
-            m_tmpShape = new QVPLine();
+            m_tmpShape = new QVPLine(this);
             m_tmpShape->handleMousePressEvent(me);
             updateImage();
         } elif (m_currentMode == QVP::drawEllipse){
-            m_tmpShape = new QVPEllipse();
+            m_tmpShape = new QVPEllipse(this);
             m_tmpShape->handleMousePressEvent(me);
             updateImage();
         } elif (m_currentMode == QVP::drawEllipticCurve){
             if (m_tmpShape == nullptr){
-                m_tmpShape = new QVPEllipticArc();
+                m_tmpShape = new QVPEllipticArc(this);
             }
             m_tmpShape->handleMousePressEvent(me);
             updateImage();
@@ -185,4 +179,18 @@ void QVPDocument::updateImage()
     pm.end();
 
     update(m_mainImage->rect());
+}
+
+bool QVPDocument::saveToFile(QString fileName)
+{
+    bool status;
+    QFile file(fileName);
+    if ((status = file.open(QIODevice::ReadWrite))) {
+        QTextStream stream(&file);
+        for (QVPShape* shape : m_shapesList){
+               stream << shape->toString();
+        }
+        file.close();
+    }
+    return status;
 }

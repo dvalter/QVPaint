@@ -19,12 +19,11 @@ public:
 
 
 public slots:
-    void triggered(bool);
-    void toggled(bool);
-    void hovered();
-    void changed();
+
     void coordUpdated(QPoint coord);
     void updateMode(QVP::editorMode);
+    void open();
+    void save();
 
 //signals:
 //    void updateCoord(QPoint coord);
@@ -39,6 +38,7 @@ private:
     QLabel* m_toolLbl;
     QLabel* m_messageLbl;
     QList<QVPToolPair> m_toolsList;
+    QActionGroup* m_toolActionGroup;
 
 
     void initToolbar(QToolBar*, QList<QVPToolPair>, Qt::ToolBarArea);

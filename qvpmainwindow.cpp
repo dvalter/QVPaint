@@ -12,13 +12,14 @@ QString msgLabelText(const QString& str)
 
 QVPMainWindow::QVPMainWindow(QWidget *parent)
     : QMainWindow(parent),
-      m_scrollArea(new QScrollArea),
+      m_scrollArea(new QScrollArea(this)),
       m_leftToolBar(new QToolBar("Tools")),
       m_mainDocument(new QVPDocument),
-      m_coordXlbl(new QLabel),
-      m_coordYlbl(new QLabel),
-      m_toolLbl(new QLabel),
-      m_messageLbl(new QLabel)
+      m_coordXlbl(new QLabel(this)),
+      m_coordYlbl(new QLabel(this)),
+      m_toolLbl(new QLabel(this)),
+      m_messageLbl(new QLabel(this)),
+      m_toolActionGroup(new QActionGroup(this))
 {
 
     //QStringList toolbarElementsList({"selection", "dot", "line", "ellipse", "elliptic-curve", "cross"});
@@ -48,6 +49,7 @@ QVPMainWindow::QVPMainWindow(QWidget *parent)
 
 }
 
+
 void QVPMainWindow::coordUpdated(QPoint coord)
 {
     m_coordXlbl->setText(QString().sprintf("%s: %4d", "X", coord.x()));
@@ -70,16 +72,21 @@ void QVPMainWindow::initToolsList()
 
 void QVPMainWindow::initToolbar(QToolBar * toolBar, QList<QVPToolPair > elements, Qt::ToolBarArea area)
 {
-    QActionGroup* acts = new QActionGroup(this);
+    QMenu *const fileMenu = menuBar()->addMenu("&File");
+    fileMenu->addAction("&Open...", this, SLOT(open()), QKeySequence::Open);
+    fileMenu->addAction("&Save As...", this, SLOT(save()), QKeySequence::SaveAs);
+    fileMenu->addSeparator();
+    fileMenu->addAction(tr("E&xit"),this, SLOT(close()), QKeySequence::Quit);
+
+    QMenu *const toolMenu = menuBar()->addMenu("&Tools");
+
     for (QVPToolPair mode : elements){
         QVPAction* act = new QVPAction(QPixmap(":/" + mode.second + ".svg"), mode.second, mode.first);
         act->setCheckable(true);
-        acts->addAction(act);
+        m_toolActionGroup->addAction(act);
 
-//        QObject::connect(act, &QAction::hovered, this, &QVPMainWindow::hovered);
-//        QObject::connect(act, &QAction::changed, this, &QVPMainWindow::changed);
-//        QObject::connect(act, &QAction::triggered, this, &QVPMainWindow::triggered);
-//        QObject::connect(act, &QAction::toggled, this, &QVPMainWindow::toggled);
+        toolMenu->addAction(act);
+
 
         QObject::connect(act, &QVPAction::toggled, this, &QVPMainWindow::updateMode);
         QObject::connect(act, &QVPAction::toggled, m_mainDocument, &QVPDocument::setEditorMode);
@@ -88,7 +95,10 @@ void QVPMainWindow::initToolbar(QToolBar * toolBar, QList<QVPToolPair > elements
             act->setChecked(true);
         }
     }
-    toolBar->addActions(acts->actions());
+
+    m_toolActionGroup->setExclusive(true);
+
+    toolBar->addActions(m_toolActionGroup->actions());
     toolBar->setFloatable(false);
     toolBar->setMovable(false);
     addToolBar(area, m_leftToolBar);
@@ -107,29 +117,26 @@ void QVPMainWindow::updateMode(QVP::editorMode mode)
 
 }
 
-void QVPMainWindow::toggled(bool b){
-    qDebug() << __FUNCTION__ << " " << (unsigned long long)QObject::sender() << " value:" << b;
-}
-
-void QVPMainWindow::triggered(bool b){
-    static QSet<QObject*> set;
-    QObject* sender = QObject::sender();
-    if (!set.contains(sender)){
-        set.insert(sender);
-    } else {
-        QAction* btn = qobject_cast<QAction*>(sender);
-
-//        if (btn->isChecked()){
-//            btn->setChecked(false);
-//        }
+void QVPMainWindow::open()
+{
+    const QString fileName =
+        QFileDialog::getOpenFileName(
+                this, "Open File", QDir::currentPath());
+    if (!fileName.isEmpty()) {
+        qCritical() << "NOT IMPLEMENTED OPEN FILE!";
     }
-    qDebug() << __FUNCTION__ << " " << (unsigned long long)sender << " value:" << b;
 }
 
-void QVPMainWindow::hovered(){
-    qDebug() << __FUNCTION__ << " " << (unsigned long long)QObject::sender();
+void QVPMainWindow::save()
+{
+    const QString initialPath = QDir::currentPath() + "/untitled.qvpi";
+
+    const QString fileName =
+            QFileDialog::getSaveFileName(
+                this, "Save As", initialPath, "QVPI Files (*.qvpi);;All Files (*)");
+    //qCritical() << "SAVE FILE NOT IMPLEMENTED";
+    if (!(!fileName.isEmpty() && m_mainDocument->saveToFile(fileName)))
+        qCritical() << "FAILED TO SAVE";
 }
 
-void QVPMainWindow::changed(){
-    qDebug() << __FUNCTION__ << " " << (unsigned long long)QObject::sender();
-}
+

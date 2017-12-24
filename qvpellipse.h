@@ -15,6 +15,7 @@ public:
     virtual void handleMousePressEvent(QMouseEvent * me) override;
     virtual void handleMouseReleaseEvent(QMouseEvent * me) override;
     virtual QVPRasterizedShape& getRasterized() {return *(new QVPRasterizedShape());}
+    virtual QString toString() override;
 
 protected:
     virtual void update() override;

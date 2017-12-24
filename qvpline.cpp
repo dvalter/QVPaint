@@ -1,5 +1,6 @@
 #include "qvpline.h"
 #include <string.h>
+#include <sstream>
 
 
 QVPLine::QVPLine(QColor penColor):
@@ -125,4 +126,12 @@ QVPRasterizedShape& QVPLine::getRasterized()
     if (!m_rasterized)
         update();
     return *m_rasterized;
+}
+
+QString QVPLine::toString()
+{
+    std::stringstream ss;
+    ss << "L;" << m_firstPoint.x() << ";" << m_firstPoint.y() << ";" <<
+              m_lastPoint.x() << ";" << m_lastPoint.y() << ";\n";
+    return QString::fromStdString(std::string(ss.str()));
 }

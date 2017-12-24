@@ -1,6 +1,8 @@
 #include "qvpellipticarc.h"
 #include <string.h>
-#include <math.h>
+#include <sstream>
+#include <assert.h>
+#include <stdio.h>
 
 inline float angleFromSC(float sin, float cos);
 inline float Q_rsqrt( float number );
@@ -23,11 +25,23 @@ QVPEllipticArc::QVPEllipticArc(QObject * parent):
 
 }
 
-
+QVPEllipticArc::QVPEllipticArc(QObject *parent, QColor penColor, QPointF center,
+                               float a, float b, float a1, float a2):
+    QVPShape(parent, penColor),
+    m_center(center),
+    m_a(a),
+    m_b(b),
+    m_ang1(a1),
+    m_ang2(a2),
+    m_state(5)
+{
+    update();
+}
 
 inline void QVPEllipticArc::appendPoint(QPoint point, QVector<QPoint>& vec)
 {
-    if (m_state < 5 || checkPoint(point)){
+    if (m_state < 4 || checkPoint(point)){
+        //qDebug() << angleFromSC(sin(point), cos(point));
         vec.append(point);
     }
 }
@@ -229,23 +243,23 @@ void QVPEllipticArc::handleMouseReleaseEvent(QMouseEvent * me)
 
 inline float QVPEllipticArc::sin(QPointF point)
 {
-    float x = point.x() - m_center.x();
-    float y = point.y() - m_center.y();
+    volatile float x = point.x() - m_center.x();
+    volatile float y = point.y() - m_center.y();
     return y*Q_rsqrt(x*x + y*y);
 }
 
 
 inline float QVPEllipticArc::cos(QPointF point)
 {
-    float x = point.x() - m_center.x();
-    float y = point.y() - m_center.y();
+    volatile float x = point.x() - m_center.x();
+    volatile float y = point.y() - m_center.y();
     return x*Q_rsqrt(x*x + y*y);
 }
 
 inline float Q_rsqrt( float number )
 {
-    long i;
-    float x2, y;
+    volatile long i;
+    volatile float x2, y;
     const float threehalfs = 1.5F;
 
     x2 = number * 0.5F;
@@ -269,34 +283,47 @@ inline float angleFromSC(float sin, float cos){
     float asin = asinf(sin);
     float acos = acosf(cos);
     if (acos < 0.7){
-        return asin;
+        return -asin;
     } elif (acos > 2.4){
-        return asin < 0 ? - M_PI - asin : M_PI - asin;
+        return asin < 0 ? M_PI + asin : - M_PI + asin;
     } else {
-        return asin < 0 ? -acos :  acos;
+        return asin < 0 ? acos :  -acos;
     }
 }
 
 inline bool QVPEllipticArc::checkPoint(QPoint point){
     float angle = angleFromSC(sin(point), cos(point));
 
-
-    bool result;
-    if (m_ang1 - m_ang2 > M_PI){
-        qDebug() << "case A";
-        result =  angle > m_ang1  || angle < m_ang2;
-    } elif (m_ang2 - m_ang1 > M_PI){
-        qDebug() << "case B"
-                    "";
-        result =  angle > m_ang2  || angle < m_ang1;
-    } elif (m_ang1 < m_ang2){
-        qDebug() << "case 1";
-        result =  angle > m_ang1  && angle < m_ang2;
+    if (m_ang1 < m_ang2){
+        return result =  angle > m_ang1 && angle < m_ang2;
+    } elif (m_ang1 > m_ang2) {
+        return angle > m_ang1 || angle < m_ang2;
     } else {
-        qDebug() << "case 2";
-        result =  angle < m_ang1  && angle > m_ang2;
+        return true;
     }
 
-    return result;
+//    if (m_ang1 - m_ang2 > M_PI){
+////        qDebug() << "case A";
+//        result =  angle > m_ang1  || angle < m_ang2;
+//    } elif (m_ang2 - m_ang1 > M_PI){
+////        qDebug() << "case B";
+//        result =  angle > m_ang2  || angle < m_ang1;
+//    } elif (m_ang1 < m_ang2){
+////        qDebug() << "case 1";
+//        result =  angle > m_ang1  && angle < m_ang2;
+//    } else {
+////        qDebug() << "case 2";
+//        result =  angle < m_ang1  && angle > m_ang2;
+//    }
 
+//    return result;
+
+}
+
+QString QVPEllipticArc::toString()
+{
+    std::stringstream ss;
+    ss << "A;" << m_center.x() << ";" << m_center.y() << ";" <<
+              m_a << ";" << m_b << ";" << m_ang1 << ";" << m_ang2 << ";\n";
+    return QString::fromStdString(std::string(ss.str()));
 }

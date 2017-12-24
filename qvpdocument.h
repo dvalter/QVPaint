@@ -14,6 +14,7 @@ class QVPDocument : public QLabel
     Q_OBJECT
 public:
     explicit QVPDocument(QWidget* parent = nullptr);
+    bool saveToFile(QString fileName);
 
 public slots:
     void setEditorMode(QVP::editorMode em);

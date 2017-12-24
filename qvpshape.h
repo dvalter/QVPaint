@@ -20,6 +20,7 @@ public:
     QVector<QPoint> * getPoints() { return m_shapePoints; }
     int testPoint(QPoint point);
     virtual QVPRasterizedShape& getRasterized() = 0;
+    virtual QString toString() = 0;
 
 signals:
 

@@ -1,6 +1,6 @@
 #include "qvpellipse.h"
 #include <string.h>
-
+#include <sstream>
 
 
 QVPEllipse::QVPEllipse(QColor penColor):
@@ -185,3 +185,12 @@ inline void QVPEllipse::initEllipseParams(){
     m_a = abs(m_firstPoint.x() - m_lastPoint.x()) / 2;
     m_b = abs(m_firstPoint.y() - m_lastPoint.y()) / 2;
 }
+
+QString QVPEllipse::toString()
+{
+    std::stringstream ss;
+    ss << "E;" << m_center.x() << ";" << m_center.y() << ";" <<
+              m_a << ";" << m_b << ";\n";
+    return QString::fromStdString(std::string(ss.str()));
+}
+
