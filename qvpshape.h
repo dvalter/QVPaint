@@ -34,7 +34,7 @@ protected:
 
     QVector<QPoint> * m_shapePoints = new QVector<QPoint>;
     QColor m_penColor;
-    QImage* m_image;
+//    QImage* m_image;
     bool m_mousePressed = false;
     bool m_selected = false;
     QVPRasterizedShape* m_rasterized = new QVPRasterizedShape;

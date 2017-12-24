@@ -77,12 +77,12 @@ void QVPLine::update()
 
 void QVPLine::drawLine(QColor color)
 {
-    m_image->fill(QColor(0x00, 0x00, 0x00, 0x00));
-    QPainter painter(m_image);
-    QPen pen(color);
-    pen.setWidth(1);
-    painter.setPen(pen);
-    painter.setRenderHint(QPainter::Antialiasing, true);
+//    m_image->fill(QColor(0x00, 0x00, 0x00, 0x00));
+//    QPainter painter(m_image);
+//    QPen pen(color);
+//    pen.setWidth(1);
+//    painter.setPen(pen);
+//    painter.setRenderHint(QPainter::Antialiasing, true);
 
     m_shapePoints->clear();
     bresenham_line(*m_shapePoints,
@@ -90,15 +90,15 @@ void QVPLine::drawLine(QColor color)
                 m_lastPoint.x(), m_lastPoint.y());
 
     //painter.drawPolyline(vec.data(), vec.size());
-    painter.drawPoints(m_shapePoints->data(), m_shapePoints->size());
+//    painter.drawPoints(m_shapePoints->data(), m_shapePoints->size());
 
-    if (m_selected){
-        pen.setWidth(10);
-        pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
-        painter.setPen(pen);
-        painter.drawPoint(m_firstPoint);
-        painter.drawPoint(m_lastPoint);
-    }
+//    if (m_selected){
+//        pen.setWidth(10);
+//        pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
+//        painter.setPen(pen);
+//        painter.drawPoint(m_firstPoint);
+//        painter.drawPoint(m_lastPoint);
+//    }
 }
 
 void QVPLine::handleMousePressEvent(QMouseEvent * me)

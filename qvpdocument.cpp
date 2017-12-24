@@ -21,9 +21,73 @@ QVPDocument::QVPDocument(QWidget* parent) :
     update();
 }
 
+//void QVPDocument::searchPixel(QPoint point)
+//{
+//    if (-1 != checkPixel(point))
+//        return;
+//    int x = point.x();
+//    int y = point.y();
+//    for(int i = 0; i < QVP::searchWidth; i++){
+//        for(int j = 0; j < i + 2; j++){
+//            int xDelta = j;
+//            int yDelta = i - j + 1;
+//            if (-1 != checkPixel(QPoint(x + xDelta, y + yDelta)))
+//                return;
+//            if (-1 != checkPixel(QPoint(x - xDelta, y + yDelta)))
+//                return;
+//            if (-1 != checkPixel(QPoint(x + xDelta, y - yDelta)))
+//                return;
+//            if (-1 != checkPixel(QPoint(x - xDelta, y - yDelta)))
+//                return;
+//        }
+//    }
+//}
+
+int QVPDocument::checkPixel(QPoint point){
+
+//    m_mainImage->setPixelColor(point, Qt::blue);
+//    update(m_mainImage->rect());
+
+    int counter = 0;
+    for(QVPShape* shape : m_shapesList){
+        if (qAlpha(shape->getImage().pixel(point.x(), point.y())) != 0x00){
+            shape->select(true);
+            qDebug()  << shape->metaObject()->className();
+            return counter;
+        } else {
+            shape->select(false);
+        }
+        counter++;
+    }
+    if (counter >= m_shapesList.size()){
+        return -1;
+    } else {
+        return -2;
+    }
+}
+
+void QVPDocument::searchPixel(QPoint point)
+{
+    int minDist = 2 * QVP::searchWidth * QVP::searchWidth;
+    QVPShape * selectedShape = nullptr;
+    for (auto shape : m_shapesList){
+        int dist = shape->testPoint(point);
+        if (dist < minDist){
+            selectedShape = shape;
+            minDist = dist;
+        } else {
+            shape->select(false);
+        }
+    }
+    if (selectedShape){
+        selectedShape->select(true);
+    }
+    update();
+}
+
 void QVPDocument::mousePressEvent(QMouseEvent* me)
 {
-    qDebug() << __FUNCTION__ << me;
+//    qDebug() << __FUNCTION__ << me;
     if (me->button() == Qt::LeftButton){
         if (m_currentMode == QVP::drawDot){
             m_tmpShape = new QVPDot(this);
@@ -48,52 +112,9 @@ void QVPDocument::mousePressEvent(QMouseEvent* me)
             updateImage();
         }
     }
+    qDebug() << "Shapes: " << m_shapesList.size();
 }
 
-void QVPDocument::searchPixel(QPoint point)
-{
-    if (-1 != checkPixel(point))
-        return;
-    int x = point.x();
-    int y = point.y();
-    for(int i = 0; i < QVP::searchWidth; i++){
-        for(int j = 0; j < i + 2; j++){
-            int xDelta = j;
-            int yDelta = i - j + 1;
-            if (-1 != checkPixel(QPoint(x + xDelta, y + yDelta)))
-                return;
-            if (-1 != checkPixel(QPoint(x - xDelta, y + yDelta)))
-                return;
-            if (-1 != checkPixel(QPoint(x + xDelta, y - yDelta)))
-                return;
-            if (-1 != checkPixel(QPoint(x - xDelta, y - yDelta)))
-                return;
-        }
-    }
-}
-
-int QVPDocument::checkPixel(QPoint point){
-
-//    m_mainImage->setPixelColor(point, Qt::blue);
-//    update(m_mainImage->rect());
-
-    int counter = 0;
-    for(QVPShape* shape : m_shapesList){
-        if (qAlpha(shape->getImage().pixel(point.x(), point.y())) != 0x00){
-            shape->select(true);
-            qDebug()  << shape->metaObject()->className();
-            return counter;
-        } else {
-            shape->select(false);
-        }
-        counter++;
-    }
-    if (counter >= m_shapesList.size()){
-        return -1;
-    } else {
-        return -2;
-    }
-}
 
 
 void QVPDocument::mouseMoveEvent(QMouseEvent *me)

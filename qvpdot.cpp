@@ -46,19 +46,19 @@ void QVPDot::update()
 
 void QVPDot::drawDot(QColor color)
 {
-    m_image->fill(QColor(0x00, 0x00, 0x00, 0x00));
-    QPainter painter(m_image);
-    QPen pen(color);
-    pen.setWidth(1);
-    painter.setPen(pen);
-    painter.setRenderHint(QPainter::Antialiasing, true);
+//    m_image->fill(QColor(0x00, 0x00, 0x00, 0x00));
+//    QPainter painter(m_image);
+//    QPen pen(color);
+//    pen.setWidth(1);
+//    painter.setPen(pen);
+//    painter.setRenderHint(QPainter::Antialiasing, true);
 
-    if (m_selected){
-        pen.setWidth(10);
-        pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
-        painter.setPen(pen);
-    }
-    painter.drawPoint(m_firstPoint);
+//    if (m_selected){
+//        pen.setWidth(10);
+//        pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
+//        painter.setPen(pen);
+//    }
+//    painter.drawPoint(m_firstPoint);
 }
 
 void QVPDot::handleMousePressEvent(QMouseEvent * me)

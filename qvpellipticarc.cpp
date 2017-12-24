@@ -129,50 +129,50 @@ void QVPEllipticArc::update()
 
 void QVPEllipticArc::drawEllipse(QColor color)
 {
-    m_image->fill(QColor(0x00, 0x00, 0x00, 0x00));
-    //m_image->fill(QColor(0x00, 0x00, 0x00, 0xFF));
-    QPainter painter(m_image);
-    QPen pen(color);
-    painter.setPen(pen);
-    painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.setBrush(QBrush(Qt::NoBrush));
+//    m_image->fill(QColor(0x00, 0x00, 0x00, 0x00));
+//    //m_image->fill(QColor(0x00, 0x00, 0x00, 0xFF));
+//    QPainter painter(m_image);
+//    QPen pen(color);
+//    painter.setPen(pen);
+//    painter.setRenderHint(QPainter::Antialiasing, true);
+//    painter.setBrush(QBrush(Qt::NoBrush));
 
     m_shapePoints->clear();
     bresenham_elliptic_arc(*m_shapePoints,
                 m_center.x(), m_center.y(), m_a, m_b);
 
-    painter.drawPoints(m_shapePoints->data(), m_shapePoints->size());
+//    painter.drawPoints(m_shapePoints->data(), m_shapePoints->size());
 
 
-    if (m_selected){
-        pen.setWidth(10);
-        pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
-        painter.setPen(pen);
-        painter.drawPoint(m_center);
-        pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
-        painter.setPen(pen);
-        painter.drawPoint(QPoint(m_center.x() + m_a, m_center.y() + m_b));
-        painter.drawPoint(QPoint(m_center.x() - m_a, m_center.y() - m_b));
-        painter.drawPoint(QPoint(m_center.x() + m_a, m_center.y() - m_b));
-        painter.drawPoint(QPoint(m_center.x() - m_a, m_center.y() + m_b));
-    }
+//    if (m_selected){
+//        pen.setWidth(10);
+//        pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
+//        painter.setPen(pen);
+//        painter.drawPoint(m_center);
+//        pen.setColor(QColor(0xFF, 0xFF, 0x0, 0xFF));
+//        painter.setPen(pen);
+//        painter.drawPoint(QPoint(m_center.x() + m_a, m_center.y() + m_b));
+//        painter.drawPoint(QPoint(m_center.x() - m_a, m_center.y() - m_b));
+//        painter.drawPoint(QPoint(m_center.x() + m_a, m_center.y() - m_b));
+//        painter.drawPoint(QPoint(m_center.x() - m_a, m_center.y() + m_b));
+//    }
 }
 
 
 
 void QVPEllipticArc::drawLine(QColor color, QPointF point){
-    QPainter painter(m_image);
-    QPen pen(color);
-    pen.setWidth(1);
-    painter.setPen(pen);
-    painter.setRenderHint(QPainter::Antialiasing, true);
+//    QPainter painter(m_image);
+//    QPen pen(color);
+//    pen.setWidth(1);
+//    painter.setPen(pen);
+//    painter.setRenderHint(QPainter::Antialiasing, true);
 
     bresenham_line(*m_shapePoints,
                 m_center.x(), m_center.y(),
                 point.x(), point.y());
 
 
-    painter.drawPoints(m_shapePoints->data(), m_shapePoints->size());
+//    painter.drawPoints(m_shapePoints->data(), m_shapePoints->size());
 }
 
 
