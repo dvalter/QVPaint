@@ -10,7 +10,7 @@ class QVPShape : public QObject
 {
     Q_OBJECT
 public:
-    explicit QVPShape(QObject *parent = nullptr, QColor penColor = QVP::penColor, int width=1);
+    explicit QVPShape(QObject *parent = nullptr, QColor penColor = QVP::penColor, int width=2);
     virtual void handleMousePressEvent(QMouseEvent * me) = 0;
     virtual void handleMouseMoveEvent(QMouseEvent * me) = 0;
     virtual void handleMouseReleaseEvent(QMouseEvent * me) = 0;
@@ -21,6 +21,8 @@ public:
     virtual QVPRasterizedShape& getRasterized() = 0;
     virtual QString toString() = 0;
     virtual void move(QPointF vec) = 0;
+    virtual QList<QVPShape *> cutLine(QPointF first, QPointF last) = 0;
+    virtual QList<QVPShape *> cutRect(QPointF first, QPointF last) = 0;
 
 
     ~QVPShape();

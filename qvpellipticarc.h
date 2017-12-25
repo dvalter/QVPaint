@@ -22,6 +22,8 @@ public:
     virtual QVPRasterizedShape& getRasterized() { return *m_rasterized; }
     virtual QString toString() override;
     virtual void move(QPointF vec) override;
+    virtual QList<QVPShape *> cutLine(QPointF first, QPointF last) override { return QList<QVPShape *>();}
+    virtual QList<QVPShape *> cutRect(QPointF first, QPointF last) override { return QList<QVPShape *>();}
 
 protected:
     virtual void update() override;

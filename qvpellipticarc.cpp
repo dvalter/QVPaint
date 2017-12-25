@@ -133,7 +133,7 @@ void QVPEllipticArc::update()
     if (m_rasterized != nullptr){
         delete m_rasterized;
     }
-    m_rasterized = new QVPRasterizedShape(m_shapePoints, color, 2);
+    m_rasterized = new QVPRasterizedShape(m_shapePoints, color, m_width);
 }
 
 
@@ -146,11 +146,7 @@ void QVPEllipticArc::update()
 
 void QVPEllipticArc::handleMousePressEvent(QMouseEvent * me)
 {
-    //qDebug() << __FILE__ << ":" << __FUNCTION__;
-    qDebug() << __FILE__ << ":" << __FUNCTION__ << "\tstate=" << m_state
-             << "\nf=" << m_firstPoint << " l=" << m_lastPoint
-             << "\nc=" << m_center << " a=" << m_a << " b=" << m_b
-             << "\na1=" << m_ang1 << " a2=" << m_ang2;
+
 
     if (m_state < 2){
         m_firstPoint = me->pos();
@@ -169,11 +165,6 @@ void QVPEllipticArc::handleMousePressEvent(QMouseEvent * me)
 
 void QVPEllipticArc::handleMouseMoveEvent(QMouseEvent * me)
 {
-    //qDebug() << __FILE__ << ":" << __FUNCTION__;
-    qDebug() << __FILE__ << ":" << __FUNCTION__ << "\tstate=" << m_state
-             << "\nf=" << m_firstPoint << " l=" << m_lastPoint
-             << "\nc=" << m_center << " a=" << m_a << " b=" << m_b
-             << "\na1=" << m_ang1 << " a2=" << m_ang2;
     if (m_state < 2){
         m_lastPoint = me->pos();
         initEllipseParams();
@@ -191,11 +182,7 @@ void QVPEllipticArc::handleMouseMoveEvent(QMouseEvent * me)
 
 void QVPEllipticArc::handleMouseReleaseEvent(QMouseEvent * me)
 {
-    //qDebug() << __FILE__ << ":" << __FUNCTION__;
-    qDebug() << __FILE__ << ":" << __FUNCTION__ << "\tstate=" << m_state
-             << "\nf=" << m_firstPoint << " l=" << m_lastPoint
-             << "\nc=" << m_center << " a=" << m_a << " b=" << m_b
-             << "\na1=" << m_ang1 << " a2=" << m_ang2;
+
     if (m_state < 2){
         m_lastPoint = me->pos();
         initEllipseParams();
@@ -204,8 +191,6 @@ void QVPEllipticArc::handleMouseReleaseEvent(QMouseEvent * me)
         m_ang1 = angleFromSC(sin(m_firstPoint), cos(m_firstPoint));
     } else {
         m_lastPoint = me->pos();
-//        m_ang1 = angleFromSC(sin(m_firstPoint), cos(m_firstPoint));
-//        m_ang2 = angleFromSC(sin(m_lastPoint), cos(m_lastPoint));
     }
     m_mousePressed = false;
     m_state++;
@@ -272,23 +257,6 @@ inline bool QVPEllipticArc::checkPoint(QPoint point){
     } else {
         return true;
     }
-
-//    if (m_ang1 - m_ang2 > M_PI){
-////        qDebug() << "case A";
-//        result =  angle > m_ang1  || angle < m_ang2;
-//    } elif (m_ang2 - m_ang1 > M_PI){
-////        qDebug() << "case B";
-//        result =  angle > m_ang2  || angle < m_ang1;
-//    } elif (m_ang1 < m_ang2){
-////        qDebug() << "case 1";
-//        result =  angle > m_ang1  && angle < m_ang2;
-//    } else {
-////        qDebug() << "case 2";
-//        result =  angle < m_ang1  && angle > m_ang2;
-//    }
-
-//    return result;
-
 }
 
 QString QVPEllipticArc::toString()

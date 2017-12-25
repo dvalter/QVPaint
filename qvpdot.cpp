@@ -49,7 +49,7 @@ void QVPDot::update()
         delete m_rasterized;
     }
     (*m_shapePoints)[0] = QPoint(m_firstPoint.x(), m_firstPoint.y());
-    m_rasterized = new QVPRasterizedShape(m_shapePoints, color, 2);
+    m_rasterized = new QVPRasterizedShape(m_shapePoints, color, m_width);
 }
 
 

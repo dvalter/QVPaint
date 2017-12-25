@@ -39,14 +39,15 @@ QVPMainWindow::QVPMainWindow(QWidget *parent)
     m_coordYlbl->setText(QString("Y:").append(QString::number(0, 'd', 5)));
 
     m_messageLbl->setStyleSheet("font-weight: bold; color: red");
-    m_messageLbl->setText("EARLY PRE-ALPHA!");
+    m_messageLbl->setText(""/*EARLY PRE-ALPHA!"*/);
     statusBar()->addWidget(m_coordXlbl);
     statusBar()->addWidget(m_coordYlbl);
     statusBar()->addWidget(m_toolLbl);
     statusBar()->addWidget(m_messageLbl);
 
     connect(m_mainDocument, &QVPDocument::updateCoord, this, &QVPMainWindow::coordUpdated);
-
+    connect(m_mainDocument, &QVPDocument::switchToSelection, this, &QVPMainWindow::resetToSelection);
+    connect(m_mainDocument, &QVPDocument::sendMsgToUI, this, &QVPMainWindow::putMessage);
 }
 
 
@@ -99,6 +100,7 @@ void QVPMainWindow::initToolbar(QToolBar * toolBar, QList<QVPToolPair > elements
 
         if (mode.first == QVP::selectShape){
             act->setChecked(true);
+            m_selectAction = act;
         }
 
         if (counter > 4){
@@ -152,4 +154,19 @@ void QVPMainWindow::save()
         qCritical() << "FAILED TO SAVE";
 }
 
+void QVPMainWindow::resetToSelection(){
+    if (m_selectAction){
+        m_selectAction->setChecked(true);
+    }
+}
 
+void QVPMainWindow::putMessage(QString text, bool isError)
+{
+    if (isError){
+        m_messageLbl->setStyleSheet("font-weight: bold; color: red");
+    } else {
+        m_messageLbl->setStyleSheet("font-weight: regular; color: light gray");
+    }
+    m_messageLbl->setText(text);
+    qDebug() << text << " " << isError;
+}

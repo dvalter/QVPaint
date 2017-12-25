@@ -2,11 +2,9 @@
 #include <QPainter>
 #include <QDebug>
 #include <stdlib.h>
-//#include <fstream>
-//#include <regex>
-//#include <iostream>
-
+#include <math.h>
 QColor colorFrom8BitStr(QString str);
+
 
 
 QVPDocument::QVPDocument(QWidget* parent) :
@@ -50,27 +48,62 @@ void QVPDocument::mousePressEvent(QMouseEvent* me)
 {
 //    qDebug() << __FUNCTION__ << me;
     if (me->button() == Qt::LeftButton){
+
         if (m_currentMode == QVP::drawDot){
+            emit sendMsgToUI("Нарисуйте точку", false);
+
             m_tmpShape = new QVPDot(this);
             m_tmpShape->handleMousePressEvent(me);
             updateImage();
-        } elif (m_currentMode == QVP::drawLine || m_currentMode == QVP::move){
+
+        } elif (m_currentMode == QVP::drawLine || m_currentMode == QVP::move ||
+                m_currentMode == QVP::crossLine){
+            emit sendMsgToUI("Нарисуйте линию", false);
+
             m_tmpShape = new QVPLine(this);
             m_tmpShape->handleMousePressEvent(me);
             updateImage();
+
         } elif (m_currentMode == QVP::drawEllipse){
+            emit sendMsgToUI("Нарисуйте эллипс", false);
+
             m_tmpShape = new QVPEllipse(this);
             m_tmpShape->handleMousePressEvent(me);
             updateImage();
+
         } elif (m_currentMode == QVP::drawEllipticCurve){
+            emit sendMsgToUI("Нарисуйте эллипс и линиями ограничьте дугу", false);
+
             if (m_tmpShape == nullptr){
                 m_tmpShape = new QVPEllipticArc(this);
             }
             m_tmpShape->handleMousePressEvent(me);
             updateImage();
+
         } elif (m_currentMode == QVP::selectShape){
             searchPixel(me->pos());
             updateImage();
+            if (!m_selectedShapesList.empty()){
+                emit sendMsgToUI("Выберите ещё фигуры", false);
+            }
+        } elif (m_currentMode == QVP::makeOrtho){
+            if (m_selectedShapesList.isEmpty()){
+                previousWasFail = true;
+                emit sendMsgToUI("Ничего не выбрано!", true);
+                emit switchToSelection();
+            }
+            QVPLine * line = qobject_cast<QVPLine *>(m_selectedShapesList.last());
+            if (line){
+                emit sendMsgToUI("Нарисуйте линию ожидаемой длины", false);
+                m_tmpShape = new QVPLine(this);
+                m_tmpShape->handleMousePressEvent(me);
+                updateImage();
+            } else {
+                previousWasFail = true;
+                emit sendMsgToUI("Выбрана не линия", true);
+                emit switchToSelection();
+
+            }
         }
     }
     qDebug() << "Shapes: " << m_shapesList.size();
@@ -84,7 +117,8 @@ void QVPDocument::mouseMoveEvent(QMouseEvent *me)
     emit updateCoord(me->pos());
 
     if (m_currentMode == QVP::drawLine || m_currentMode == QVP::drawEllipse
-            || m_currentMode == QVP::drawDot || m_currentMode == QVP::move){
+            || m_currentMode == QVP::drawDot || m_currentMode == QVP::move
+            || m_currentMode == QVP::makeOrtho || m_currentMode == QVP::crossLine){
         if (me->buttons() & Qt::LeftButton){
             m_tmpShape->handleMouseMoveEvent(me);
         }
@@ -126,6 +160,41 @@ void QVPDocument::mouseReleaseEvent(QMouseEvent *me)
         delete m_tmpShape;
         m_tmpShape = nullptr;
         updateImage();
+    } elif (m_currentMode == QVP::makeOrtho){
+        if (m_selectedShapesList.isEmpty()){
+            previousWasFail = true;
+            emit sendMsgToUI("Ничего не выбрано!", true);
+            emit switchToSelection();
+        }
+        QVPLine* linePtr = qobject_cast<QVPLine *>(m_tmpShape);
+        QPointF a = linePtr->getFirst();
+        QPointF b = linePtr->getLast();
+        double targetLenght = sqrt((b.x() - a.x())*(b.x() - a.x()) +
+                             (b.y() - a.y())*(b.y() - a.y()));
+        QVPLine* selectedLinePtr = qobject_cast<QVPLine *>(m_selectedShapesList.last());
+        QPointF sa = selectedLinePtr->getFirst();
+        QPointF sb = selectedLinePtr->getLast();
+        float x = sb.x() - sa.x();
+        float y = sb.y() - sa.y();
+        double lenght = sqrt(x*x + y*y);
+        float scale = targetLenght/lenght;
+        b.setX(a.x() + y * scale);
+        b.setY(a.y() - x * scale);
+        m_shapesList.append(new QVPLine(this, QVP::penColor, a, b));
+        delete m_tmpShape;
+        m_tmpShape = nullptr;
+        updateImage();
+        emit switchToSelection();
+    } elif (m_currentMode == QVP::crossLine){
+        QVPLine* linePtr = qobject_cast<QVPLine *>(m_tmpShape);
+        QPointF a = linePtr->getFirst();
+        QPointF b = linePtr->getLast();
+        for (auto shape : m_selectedShapesList){
+            auto tmpList = shape->cutLine(a, b);
+            m_shapesList.append(tmpList);
+        }
+        updateImage();
+        emit switchToSelection();
     }
 }
 
@@ -147,7 +216,7 @@ void QVPDocument::paintEvent(QPaintEvent *event)
 void QVPDocument::setEditorMode(QVP::editorMode em)
 {
     qDebug() << __FUNCTION__;
-    if ((m_currentMode == QVP::selectShape &&
+    if (!previousWasFail && ((m_currentMode == QVP::selectShape &&
             !(em == QVP::move || em == QVP::makeOrtho ||
              em == QVP::clipRectangle || em == QVP::crossLine ||
              em == QVP::setUp)) ||
@@ -155,10 +224,15 @@ void QVPDocument::setEditorMode(QVP::editorMode em)
              m_currentMode == QVP::makeOrtho ||
              m_currentMode == QVP::clipRectangle ||
              m_currentMode == QVP::crossLine ||
-             m_currentMode == QVP::setUp)){
+             m_currentMode == QVP::setUp))){
         unSelect();
     }
     m_currentMode = em;
+
+    if (m_currentMode == QVP::selectShape && !previousWasFail){
+        emit sendMsgToUI("Выберите фигуру", false);
+    }
+    previousWasFail = false;
 
     if (m_tmpShape) {
         delete m_tmpShape;

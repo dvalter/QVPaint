@@ -24,6 +24,8 @@ public slots:
     void updateMode(QVP::editorMode);
     void open();
     void save();
+    void resetToSelection();
+    void putMessage(QString text, bool isError);
 
 
 
@@ -38,6 +40,7 @@ private:
     QLabel* m_messageLbl;
     QList<QVPToolPair> m_toolsList;
     QActionGroup* m_toolActionGroup;
+    QAction* m_selectAction = nullptr;
 
 
     void initToolbar(QToolBar*, QList<QVPToolPair>, Qt::ToolBarArea);

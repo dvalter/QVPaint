@@ -3,6 +3,8 @@
 #include <sstream>
 
 
+inline float Q_rsqrt( float number );
+
 QVPEllipse::QVPEllipse(QColor penColor):
     QVPShape(nullptr, penColor)
 {
@@ -133,7 +135,7 @@ void QVPEllipse::update()
     if (m_rasterized != nullptr){
         delete m_rasterized;
     }
-    m_rasterized = new QVPRasterizedShape(m_shapePoints, color, 2);
+    m_rasterized = new QVPRasterizedShape(m_shapePoints, color, m_width);
 }
 
 
@@ -172,6 +174,64 @@ inline void QVPEllipse::initEllipseParams(){
     m_b = abs(m_firstPoint.y() - m_lastPoint.y()) / 2;
 }
 
+inline float QVPEllipse::sin(QPointF point)
+{
+    volatile float x = point.x() - m_center.x();
+    volatile float y = point.y() - m_center.y();
+    return y*Q_rsqrt(x*x + y*y);
+}
+
+
+inline float QVPEllipse::cos(QPointF point)
+{
+    volatile float x = point.x() - m_center.x();
+    volatile float y = point.y() - m_center.y();
+    return x*Q_rsqrt(x*x + y*y);
+}
+
+inline float Q_rsqrt( float number )
+{
+    volatile long i;
+    volatile float x2, y;
+    const float threehalfs = 1.5F;
+
+    x2 = number * 0.5F;
+    y  = number;
+    i  = * ( long * ) &y;                       // evil floating point bit level hacking
+    i  = 0x5f3759df - ( i >> 1 );               // what the hell?
+    y  = * ( float * ) &i;
+    y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
+    // y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
+
+    return y;
+}
+
+
+
+inline float angleFromSC(float sin, float cos){
+    float asin = asinf(sin);
+    float acos = acosf(cos);
+    if (acos < 0.7){
+        return -asin;
+    } elif (acos > 2.4){
+        return asin < 0 ? M_PI + asin : - M_PI + asin;
+    } else {
+        return asin < 0 ? acos :  -acos;
+    }
+}
+
+//inline bool QVPEllipse::checkPoint(QPoint point){
+//    float angle = angleFromSC(sin(point), cos(point));
+
+//    if (m_ang1 < m_ang2){
+//        return angle > m_ang1 && angle < m_ang2;
+//    } elif (m_ang1 > m_ang2) {
+//        return angle > m_ang1 || angle < m_ang2;
+//    } else {
+//        return true;
+//    }
+//}
+
 QString QVPEllipse::toString()
 {
     std::stringstream ss;
@@ -188,4 +248,107 @@ void QVPEllipse::move(QPointF vec)
     m_center.rx() += vec.x();
     m_center.ry() += vec.y();
     update();
+}
+
+//bool ellipseIntersectLine(float a, float b, float h, float k,
+//float x1 , float y1 , float x2 , float y2,
+//float &xi1 , float &xi2 , float &yi1 , float &yi2)
+//{
+//    float aa,bb,cc,m;
+//    //
+//    if (x1 != x2){
+//        m = (y2-y1)/(x2-x1);
+//        float c = y1 - m*x1;
+//        //
+//        aa = b*b + a*a*m*m;
+//        bb = 2*a*a*c*m - 2*a*a*k*m - 2*h*b*b;
+//        cc = b*b*h*h + a*a*c*c - 2*a*a*k*c + a*a*k*k - a*a*b*b;
+//    } else {
+//    //
+//    // vertical line case
+//    //
+//    aa = a*a;
+//    bb = -2.0*k*a*a;
+//    cc = -a*a*b*b + b*b*(x1-h)*(x1-h);
+//    }
+
+//    float d = bb*bb-4*aa*cc;
+//    //
+//    // intersection points : (xi1,yi1) and (xi2,yi2)
+//    //
+//    if (d > 0.0){
+//        if (x1 != x2){
+//            xi1 = (-bb + sqrt(d)) / (2*aa);
+//            xi2 = (-bb - sqrt(d)) / (2*aa);
+//            yi1 = y1 + m * (xi1 - x1);
+//            yi2 = y1 + m * (xi2 - x1);
+//        } else {
+//            yi1 = (-bb + sqrt(d)) / (2*aa);
+//            yi2 = (-bb - sqrt(d)) / (2*aa);
+//            xi1 = x1;
+//            xi2 = x1;
+//        }
+//    } else {
+//        return false;	// no intersections
+//    }
+//    return true;
+//}
+
+bool ellipseIntersectLine(float a, float b, float h, float k,
+float x1 , float y1 , float x2 , float y2,
+float &xi1 , float &xi2 , float &yi1 , float &yi2)
+{
+    float aa,bb,cc,m;
+    //
+    if ( x1 != x2) {
+        m = (y2-y1)/(x2-x1);
+        float c = y1 - m*x1;
+        //
+        aa = b*b + a*a*m*m;
+        bb = 2*a*a*c*m - 2*a*a*k*m - 2*h*b*b;
+        cc = b*b*h*h + a*a*c*c - 2*a*a*k*c + a*a*k*k - a*a*b*b;
+    } else {
+        //
+        // vertical line case
+        //
+        aa = a*a;
+        bb = -2.0*k*a*a;
+        cc = -a*a*b*b + b*b*(x1-h)*(x1-h);
+    }
+
+    float d = bb*bb-4*aa*cc;
+    //
+    // intersection points : (xi1,yi1) and (xi2,yi2)
+    //
+    if (d > 0.0) {
+        if (x1 != x2) {
+            xi1 = (-bb + sqrt(d)) / (2*aa);
+            xi2 = (-bb - sqrt(d)) / (2*aa);
+            yi1 = y1 + m * (xi1 - x1);
+            yi2 = y1 + m * (xi2 - x1);
+        } else {
+            yi1 = (-bb + sqrt(d)) / (2*aa);
+            yi2 = (-bb - sqrt(d)) / (2*aa);
+            xi1 = x1;
+            xi2 = x1;
+        }
+    } else {
+        return false;	// no intersections
+    }
+    return true;
+}
+
+QList<QVPShape *> QVPEllipse::cutLine(QPointF first, QPointF last)
+{
+
+    float x1, x2, y1, y2;
+    QList<QVPShape *> newShapes;
+    if (ellipseIntersectLine(m_a, m_b, m_center.x(), m_center.y(), first.x(), first.y(),
+                             last.x(), last.y(), x1, x2, y1, y2/*int1.rx(), int2.rx(), int1.ry(),int2.ry()*/)){
+//        int1(QPointF(x1, y1));
+//        int2(QPointF(x2, y2));
+        QPointF int1(x1, y1), int2(x2, y2);
+        qDebug() << int1 << " " << int2 << " "/* << int1==int2*/;
+    }
+    return newShapes;
 }

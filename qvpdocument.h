@@ -30,6 +30,8 @@ private:
     qint8 m_counter = 0;
     QVP::editorMode m_currentMode = QVP::drawLine;
 
+    bool previousWasFail = false;
+
     void unSelect();
     void parseString(QString inStr);
     void updateImage();
@@ -46,6 +48,8 @@ protected:
 signals:
     void updateCoord(QPoint coord);
     void shapeSelected(bool state);
+    void switchToSelection();
+    void sendMsgToUI(QString text, bool isError);
 
 };
 
