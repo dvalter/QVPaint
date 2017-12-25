@@ -260,8 +260,8 @@ QList<QVPShape *> QVPLine::cutLine(QPointF first, QPointF last)
         QPointF res = result.toQPointF();
         qDebug() << first << "->" << last << " and " << m_firstPoint
                  << "->" << m_lastPoint << " X => " << res;
-        QVPLine * newLine = new QVPLine(parent(), m_penColor, res, m_lastPoint, m_width);
-        newShapes.append(newLine);
+        newShapes.append(new QVPLine(parent(), m_penColor, m_firstPoint, res, m_width));
+        newShapes.append(new QVPLine(parent(), m_penColor, res, m_lastPoint, m_width));
         m_lastPoint = res;
     }
     return newShapes;

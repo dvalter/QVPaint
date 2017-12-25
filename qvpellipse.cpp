@@ -1,6 +1,9 @@
 #include "qvpellipse.h"
 #include <string.h>
 #include <sstream>
+#include "qvpellipticarc.h"
+
+static const double Epsilon = 2;
 
 
 inline float Q_rsqrt( float number );
@@ -250,55 +253,33 @@ void QVPEllipse::move(QPointF vec)
     update();
 }
 
-//bool ellipseIntersectLine(float a, float b, float h, float k,
-//float x1 , float y1 , float x2 , float y2,
-//float &xi1 , float &xi2 , float &yi1 , float &yi2)
-//{
-//    float aa,bb,cc,m;
-//    //
-//    if (x1 != x2){
-//        m = (y2-y1)/(x2-x1);
-//        float c = y1 - m*x1;
-//        //
-//        aa = b*b + a*a*m*m;
-//        bb = 2*a*a*c*m - 2*a*a*k*m - 2*h*b*b;
-//        cc = b*b*h*h + a*a*c*c - 2*a*a*k*c + a*a*k*k - a*a*b*b;
-//    } else {
-//    //
-//    // vertical line case
-//    //
-//    aa = a*a;
-//    bb = -2.0*k*a*a;
-//    cc = -a*a*b*b + b*b*(x1-h)*(x1-h);
-//    }
+inline void swap(volatile float& a, volatile float& b){
+    volatile float tmp = a;
+    a = b;
+    b = tmp;
+}
 
-//    float d = bb*bb-4*aa*cc;
-//    //
-//    // intersection points : (xi1,yi1) and (xi2,yi2)
-//    //
-//    if (d > 0.0){
-//        if (x1 != x2){
-//            xi1 = (-bb + sqrt(d)) / (2*aa);
-//            xi2 = (-bb - sqrt(d)) / (2*aa);
-//            yi1 = y1 + m * (xi1 - x1);
-//            yi2 = y1 + m * (xi2 - x1);
-//        } else {
-//            yi1 = (-bb + sqrt(d)) / (2*aa);
-//            yi2 = (-bb - sqrt(d)) / (2*aa);
-//            xi1 = x1;
-//            xi2 = x1;
-//        }
-//    } else {
-//        return false;	// no intersections
-//    }
-//    return true;
-//}
+inline void swap(float& a, float& b){
+    volatile float tmp = a;
+    a = b;
+    b = tmp;
+}
 
-bool ellipseIntersectLine(float a, float b, float h, float k,
-float x1 , float y1 , float x2 , float y2,
+bool ellipseIntersectLine(volatile float a, volatile float b, volatile float h, volatile float k,
+volatile float x1 , volatile float y1 , volatile float x2 , volatile float y2,
 float &xi1 , float &xi2 , float &yi1 , float &yi2)
 {
-    float aa,bb,cc,m;
+
+    bool inverted = false;
+    if (abs(x1 - x2) < Epsilon) {
+        swap(a, b);
+        swap(h, k);
+        swap(x1, y1);
+        swap(x2, y2);
+        inverted = true;
+        qDebug() << "inverted";
+    }
+    volatile float aa,bb,cc,m;
     //
     if ( x1 != x2) {
         m = (y2-y1)/(x2-x1);
@@ -335,7 +316,33 @@ float &xi1 , float &xi2 , float &yi1 , float &yi2)
     } else {
         return false;	// no intersections
     }
+    if (inverted) {
+        swap(xi1, yi1);
+        swap(xi2, yi2);
+    }
     return true;
+}
+
+inline float min(const float& a, const float& b)
+{
+    return a<b?a:b;
+}
+
+inline float max(const float& a, const float& b)
+{
+    return a>b?a:b;
+}
+
+inline bool between(const QPointF& a, const QPointF& first, const QPointF& last)
+{
+    bool m = a.x() <= max(first.x(), last.x());
+    bool n = a.y() <= max(first.y(), last.y());
+    bool o = a.x() >= min(first.x(), last.x());
+    bool p = a.y() >= min(first.y(), last.y());
+    return m && n && o && p;
+
+//    return a.x() < max(first.x(), last.x()) && a.y() < max(first.y(), last.y()) &&
+//            a.x() > min(first.x(), last.x()) && a.y() > min(first.y(), last.y());
 }
 
 QList<QVPShape *> QVPEllipse::cutLine(QPointF first, QPointF last)
@@ -348,7 +355,13 @@ QList<QVPShape *> QVPEllipse::cutLine(QPointF first, QPointF last)
 //        int1(QPointF(x1, y1));
 //        int2(QPointF(x2, y2));
         QPointF int1(x1, y1), int2(x2, y2);
-        qDebug() << int1 << " " << int2 << " "/* << int1==int2*/;
+        qDebug() << int1 << " " << between(int1, first, last) << " " << int2 << " " << between(int2, first, last)/* << int1==int2*/;
+        if (between(int1, first, last) && between(int2, first, last)){
+            float ang1 = angleFromSC(sin(int1), cos(int1));
+            float ang2 = angleFromSC(sin(int2), cos(int2));
+            newShapes.append(new QVPEllipticArc(parent(), m_penColor, m_center, m_a, m_b, ang1, ang2, m_width));
+            newShapes.append(new QVPEllipticArc(parent(), m_penColor, m_center, m_a, m_b, ang2, ang1, m_width));
+        }
     }
     return newShapes;
 }

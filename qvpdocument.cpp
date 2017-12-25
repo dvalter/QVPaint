@@ -189,11 +189,27 @@ void QVPDocument::mouseReleaseEvent(QMouseEvent *me)
         QVPLine* linePtr = qobject_cast<QVPLine *>(m_tmpShape);
         QPointF a = linePtr->getFirst();
         QPointF b = linePtr->getLast();
+        QStack<QVPShape*> removeStack;
+        QList<QVPShape*> addList;
+//        for(auto it = m_selectedShapesList.begin(); it != m_selectedShapesList.end(); it++){
         for (auto shape : m_selectedShapesList){
             auto tmpList = shape->cutLine(a, b);
-            m_shapesList.append(tmpList);
+            if (!tmpList.isEmpty()){
+
+                //delete m_shapesList.last();
+                //m_shapesList.removeLast();
+                removeStack.append(shape);
+                addList.append(tmpList);
+            }
         }
+        unSelect();
         updateImage();
+        while(!removeStack.isEmpty()){
+            auto shape = removeStack.pop();
+            delete shape;
+            m_shapesList.removeAll(shape);
+        }
+        m_shapesList.append(addList);
         emit switchToSelection();
     }
 }
