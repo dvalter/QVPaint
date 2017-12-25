@@ -181,7 +181,8 @@ inline float QVPEllipse::sin(QPointF point)
 {
     volatile float x = point.x() - m_center.x();
     volatile float y = point.y() - m_center.y();
-    return y*Q_rsqrt(x*x + y*y);
+//    return y*Q_rsqrt(x*x + y*y);
+    return y / sqrt(x*x + y*y);
 }
 
 
@@ -189,31 +190,16 @@ inline float QVPEllipse::cos(QPointF point)
 {
     volatile float x = point.x() - m_center.x();
     volatile float y = point.y() - m_center.y();
-    return x*Q_rsqrt(x*x + y*y);
+//    return x*Q_rsqrt(x*x + y*y);
+    return x / sqrt(x*x + y*y);
 }
 
-inline float Q_rsqrt( float number )
-{
-    volatile long i;
-    volatile float x2, y;
-    const float threehalfs = 1.5F;
-
-    x2 = number * 0.5F;
-    y  = number;
-    i  = * ( long * ) &y;                       // evil floating point bit level hacking
-    i  = 0x5f3759df - ( i >> 1 );               // what the hell?
-    y  = * ( float * ) &i;
-    y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
-    // y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
-
-    return y;
-}
 
 
 
 inline float angleFromSC(float sin, float cos){
-    float asin = asinf(sin);
-    float acos = acosf(cos);
+    volatile float asin = asinf(sin);
+    volatile float acos = acosf(cos);
     if (acos < 0.7){
         return -asin;
     } elif (acos > 2.4){
@@ -223,17 +209,7 @@ inline float angleFromSC(float sin, float cos){
     }
 }
 
-//inline bool QVPEllipse::checkPoint(QPoint point){
-//    float angle = angleFromSC(sin(point), cos(point));
 
-//    if (m_ang1 < m_ang2){
-//        return angle > m_ang1 && angle < m_ang2;
-//    } elif (m_ang1 > m_ang2) {
-//        return angle > m_ang1 || angle < m_ang2;
-//    } else {
-//        return true;
-//    }
-//}
 
 QString QVPEllipse::toString()
 {
@@ -265,7 +241,7 @@ inline void swap(float& a, float& b){
     b = tmp;
 }
 
-bool ellipseIntersectLine(volatile float a, volatile float b, volatile float h, volatile float k,
+static bool ellipseIntersectLine(volatile float a, volatile float b, volatile float h, volatile float k,
 volatile float x1 , volatile float y1 , volatile float x2 , volatile float y2,
 float &xi1 , float &xi2 , float &yi1 , float &yi2)
 {
@@ -357,8 +333,10 @@ QList<QVPShape *> QVPEllipse::cutLine(QPointF first, QPointF last)
         QPointF int1(x1, y1), int2(x2, y2);
         qDebug() << int1 << " " << between(int1, first, last) << " " << int2 << " " << between(int2, first, last)/* << int1==int2*/;
         if (between(int1, first, last) && between(int2, first, last)){
-            float ang1 = angleFromSC(sin(int1), cos(int1));
-            float ang2 = angleFromSC(sin(int2), cos(int2));
+            volatile float ang1 = angleFromSC(sin(int1), cos(int1));
+            //qDebug() << ang1;
+            volatile float ang2 = angleFromSC(sin(int2), cos(int2));
+            //qDebug() << ang2;
             newShapes.append(new QVPEllipticArc(parent(), m_penColor, m_center, m_a, m_b, ang1, ang2, m_width));
             newShapes.append(new QVPEllipticArc(parent(), m_penColor, m_center, m_a, m_b, ang2, ang1, m_width));
         }
