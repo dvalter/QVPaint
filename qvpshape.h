@@ -23,10 +23,22 @@ public:
     virtual void move(QPointF vec) = 0;
     virtual QList<QVPShape *> cutLine(QPointF first, QPointF last) = 0;
     virtual QList<QVPShape *> cutRect(QPointF first, QPointF last);
-    QColor getColor() { return m_penColor; }
-    int getWidth() { return m_width; }
 
-    ~QVPShape();
+    QColor getColor() const;
+    int getWidth() const;
+
+    void setColor(const QColor &penColor);
+    void setWidth(int width);
+
+    virtual ~QVPShape();
+
+
+
+
+
+
+
+
 signals:
 
 public slots:

@@ -21,6 +21,16 @@ public:
     virtual QList<QVPShape *> cutLine(QPointF first, QPointF last) override;
     virtual QList<QVPShape *> cutRect(QPointF first, QPointF last) override;
 
+
+    QPointF getCenter() const;
+    void setCenter(const QPointF &center);
+
+    int getA() const;
+    void setA(int a);
+
+    int getB() const;
+    void setB(int b);
+
 protected:
     virtual void update() override;
 

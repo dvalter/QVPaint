@@ -52,6 +52,17 @@ void QVPDot::update()
     m_rasterized = new QVPRasterizedShape(m_shapePoints, color, m_width);
 }
 
+QPointF QVPDot::getCenter() const
+{
+    return m_firstPoint;
+}
+
+void QVPDot::setCenter(const QPointF &firstPoint)
+{
+    m_firstPoint = firstPoint;
+    update();
+}
+
 
 
 void QVPDot::handleMousePressEvent(QMouseEvent * me)

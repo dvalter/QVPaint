@@ -32,7 +32,6 @@ public:
     quint8 getColor() { return m_color; }
 
     virtual ~QVPColorButton(){
-        qDebug() << __FUNCTION__;
     }
 
 signals:
@@ -67,64 +66,78 @@ public:
 
 
     virtual ~QVPShapeActions(){
+        delete m_colorButton;
         qDebug() << __FUNCTION__;
     }
 
 signals:
+    void finished();
+    void updateShape(QColor color, int width, QPointF first, QPointF last,
+                     float a, float b, float ang1, float ang2);
 
 public slots:
     void showColorGrid();
     void setColor(quint8 color);
     void hideColorGrid();
     void saveColorGrid();
+    void cancel();
+    void save();
+
+protected:
+    void closeEvent(QCloseEvent *event) {
+        event->ignore();
+        cancel();
+    }
+
 private:
+
 
     void init(int width,
               QPointF firstCoord);
 
-    QWidget m_mainWgt;
+    QWidget* m_mainWgt = new QWidget(this);
 
     QVP::shapeType m_shapeType;
-    QGridLayout m_gridLayout;
+    QGridLayout* m_gridLayout = new QGridLayout(this);
 
-    QLabel m_firstCoordXLbl;
-    QDoubleSpinBox m_firstCoordXSb;
-    QLabel m_firstCoordYLbl;
-    QDoubleSpinBox m_firstCoordYSb;
+    QLabel* m_firstCoordXLbl = new QLabel(this);
+    QDoubleSpinBox* m_firstCoordXSb = new QDoubleSpinBox(this);
+    QLabel* m_firstCoordYLbl  = new QLabel(this);
+    QDoubleSpinBox* m_firstCoordYSb = new QDoubleSpinBox(this);
 
-    QLabel m_lastCoordXLbl;
-    QDoubleSpinBox m_lastCoordXSb;
-    QLabel m_lastCoordYLbl;
-    QDoubleSpinBox m_lastCoordYSb;
+    QLabel* m_lastCoordXLbl  = nullptr;
+    QDoubleSpinBox* m_lastCoordXSb = nullptr;
+    QLabel* m_lastCoordYLbl  = nullptr;
+    QDoubleSpinBox* m_lastCoordYSb = nullptr;
 
-    QLabel m_paramALbl;
-    QDoubleSpinBox m_paramASb;
-    QLabel m_paramBLbl;
-    QDoubleSpinBox m_paramBSb;
+    QLabel* m_paramALbl  = nullptr;
+    QDoubleSpinBox* m_paramASb = nullptr;
+    QLabel* m_paramBLbl  = nullptr;
+    QDoubleSpinBox* m_paramBSb = nullptr;
 
-    QLabel m_paramAng1Lbl;
-    QDoubleSpinBox m_paramAng1Sb;
-    QLabel m_paramAng2Lbl;
-    QDoubleSpinBox m_paramAng2Sb;
+    QLabel* m_paramAng1Lbl  = nullptr;
+    QDoubleSpinBox* m_paramAng1Sb = nullptr;
+    QLabel* m_paramAng2Lbl  = nullptr;
+    QDoubleSpinBox* m_paramAng2Sb = nullptr;
 
-    QLabel m_widthLbl;
-    QSpinBox m_widthSb;
+    QLabel* m_widthLbl  = new QLabel(this);
+    QSpinBox* m_widthSb = new QSpinBox(this);
 
 //    QHBoxLayout m_colorBox;
-    QLabel m_colorLbl;
+    QLabel* m_colorLbl  = new QLabel(this);
     QColor m_color;
     QColor m_newColor;
 
-    QVPColorButton m_colorButton;
+    QVPColorButton* m_colorButton;
     bool m_colorConsistency = true;
     QList<QVPColorButton *> m_colorGridButtons;
-    QVPColorGridWidget m_colorSelectionWidget;
+    QVPColorGridWidget* m_colorSelectionWidget = new QVPColorGridWidget(this);
 
-    QPushButton m_confirmButton;
-    QPushButton m_cancelButton;
+    QPushButton* m_confirmButton = new QPushButton(this);
+    QPushButton* m_cancelButton = new QPushButton(this);
 
-    QPushButton m_colorConfirmButton;
-    QPushButton m_colorCancelButton;
+    QPushButton* m_colorConfirmButton = new QPushButton(this);
+    QPushButton* m_colorCancelButton = new QPushButton(this);
 
 
 

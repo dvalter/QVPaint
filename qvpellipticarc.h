@@ -23,7 +23,23 @@ public:
     virtual QString toString() override;
     virtual void move(QPointF vec) override;
     virtual QList<QVPShape *> cutLine(QPointF first, QPointF last) override;
-//    virtual QList<QVPShape *> cutRect(QPointF first, QPointF last) override { return QList<QVPShape *>();}
+
+
+
+    QPointF getCenter() const;
+    void setCenter(const QPointF &center);
+
+    float getA() const;
+    void setA(float a);
+
+    float getB() const;
+    void setB(float b);
+
+    float getAng1() const;
+    void setAng1(float ang1);
+
+    float getAng2() const;
+    void setAng2(float ang2);
 
 protected:
     virtual void update() override;

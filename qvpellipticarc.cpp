@@ -226,6 +226,61 @@ inline void QVPEllipticArc::initEllipseParams(){
     m_b = abs(m_firstPoint.y() - m_lastPoint.y()) / 2;
 }
 
+float QVPEllipticArc::getAng2() const
+{
+    return m_ang2;
+}
+
+void QVPEllipticArc::setAng2(float ang2)
+{
+    m_ang2 = ang2;
+    update();
+}
+
+float QVPEllipticArc::getAng1() const
+{
+    return m_ang1;
+}
+
+void QVPEllipticArc::setAng1(float ang1)
+{
+    m_ang1 = ang1;
+    update();
+}
+
+float QVPEllipticArc::getB() const
+{
+    return m_b;
+}
+
+void QVPEllipticArc::setB(float b)
+{
+    m_b = b;
+    update();
+}
+
+float QVPEllipticArc::getA() const
+{
+    return m_a;
+}
+
+void QVPEllipticArc::setA(float a)
+{
+    m_a = a;
+    update();
+}
+
+QPointF QVPEllipticArc::getCenter() const
+{
+    return m_center;
+}
+
+void QVPEllipticArc::setCenter(const QPointF &center)
+{
+    m_center = center;
+    update();
+}
+
 inline float angleFromSC(float sin, float cos){
     float asin = asinf(sin);
     float acos = acosf(cos);

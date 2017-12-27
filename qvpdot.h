@@ -22,6 +22,9 @@ public:
     QPointF getCenter() { return m_firstPoint; }
 //    virtual QList<QVPShape *> cutRect(QPointF first, QPointF last) override;// { return QList<QVPShape *>();}
 
+    QPointF getCenter() const;
+    void setCenter(const QPointF &firstPoint);
+
 protected:
     virtual void update() override;
 

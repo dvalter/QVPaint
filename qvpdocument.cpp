@@ -288,15 +288,53 @@ void QVPDocument::setEditorMode(QVP::editorMode em)
         if (m_selectedShapesList.empty()){
             previousWasFail = true;
             emit switchToSelection();
-        } else {
+        } elif(!m_shapeActions) {
             QVPShape* shape = m_selectedShapesList.last();
             if (qobject_cast<QVPDot *>(shape)){
                 QVPDot* dot = qobject_cast<QVPDot *>(shape);
-                m_shapeActions = new QVPShapeActions(nullptr, QVP::point, dot->getColor(), dot->getWidth(), dot->getCenter());
+                m_shapeActions = new QVPShapeActions(nullptr, QVP::point, shape->getColor(),
+                                                     shape->getWidth(), dot->getCenter());
+
+                connect(m_shapeActions, &QVPShapeActions::finished, this, &QVPDocument::acceptParamsClose);
+                connect(m_shapeActions, &QVPShapeActions::updateShape, this, &QVPDocument::receiveParams);
+
                 m_shapeActions->show();
-                //emit showSetupWindow(m_shapeActions);
+            } elif (qobject_cast<QVPLine *>(shape)){
+                QVPLine* line = qobject_cast<QVPLine *>(shape);
+                m_shapeActions = new QVPShapeActions(nullptr, QVP::line, shape->getColor(),
+                                                     shape->getWidth(), line->getFirst(), line->getLast());
+
+                connect(m_shapeActions, &QVPShapeActions::finished, this, &QVPDocument::acceptParamsClose);
+                connect(m_shapeActions, &QVPShapeActions::updateShape, this, &QVPDocument::receiveParams);
+
+                m_shapeActions->show();
+            } elif (qobject_cast<QVPEllipse *>(shape)){
+                QVPEllipse* ellipse = qobject_cast<QVPEllipse *>(shape);
+                m_shapeActions = new QVPShapeActions(nullptr, QVP::ellipse, shape->getColor(),
+                                                     shape->getWidth(), ellipse->getCenter(),
+                                                     ellipse->getA(), ellipse->getB());
+
+                connect(m_shapeActions, &QVPShapeActions::finished, this, &QVPDocument::acceptParamsClose);
+                connect(m_shapeActions, &QVPShapeActions::updateShape, this, &QVPDocument::receiveParams);
+
+                m_shapeActions->show();
+            } elif (qobject_cast<QVPEllipticArc *>(shape)){
+                QVPEllipticArc* arc = qobject_cast<QVPEllipticArc *>(shape);
+                m_shapeActions = new QVPShapeActions(nullptr, QVP::ellipse, shape->getColor(),
+                                                     shape->getWidth(), arc->getCenter(),
+                                                     arc->getA(), arc->getB(),
+                                                     arc->getAng1(), arc->getAng2());
+
+                connect(m_shapeActions, &QVPShapeActions::finished, this, &QVPDocument::acceptParamsClose);
+                connect(m_shapeActions, &QVPShapeActions::updateShape, this, &QVPDocument::receiveParams);
+
+                m_shapeActions->show();
             }
         }
+    } elif(m_shapeActions) {
+        m_shapeActions->close();
+        m_shapeActions->deleteLater();
+        m_shapeActions = nullptr;
     }
 
 
@@ -408,4 +446,51 @@ bool QVPDocument::saveToFile(const QString& fileName)
         file.close();
     }
     return status;
+}
+
+void QVPDocument::acceptParamsClose()
+{
+    if(m_shapeActions) {
+        m_shapeActions->close();
+//        delete m_shapeActions;
+        m_shapeActions->deleteLater();
+        m_shapeActions = nullptr;
+    }
+
+    emit switchToSelection();
+}
+
+void QVPDocument::receiveParams(QColor color, int width, QPointF first, QPointF last,
+                                float a, float b, float ang1, float ang2)
+{
+    QVPShape* shape = m_selectedShapesList.last();
+    shape->setColor(color);
+    shape->setWidth(width);
+
+    if (qobject_cast<QVPDot *>(shape)){
+        QVPDot* dot = qobject_cast<QVPDot *>(shape);
+        dot->setCenter(first);
+
+    } elif (qobject_cast<QVPLine *>(shape)){
+        QVPLine* line = qobject_cast<QVPLine *>(shape);
+        line->setFirst(first);
+        line->setLast(last);
+
+    } elif (qobject_cast<QVPEllipse *>(shape)){
+        QVPEllipse* ellipse = qobject_cast<QVPEllipse *>(shape);
+        ellipse->setCenter(first);
+        ellipse->setA(a);
+        ellipse->setB(b);
+
+    } elif (qobject_cast<QVPEllipticArc *>(shape)){
+        QVPEllipticArc* arc = qobject_cast<QVPEllipticArc *>(shape);
+        arc->setCenter(first);
+        arc->setA(a);
+        arc->setB(b);
+        arc->setAng1(ang1);
+        arc->setAng2(ang2);
+
+    }
+    acceptParamsClose();
+    updateImage();
 }

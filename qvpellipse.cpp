@@ -195,6 +195,39 @@ inline float QVPEllipse::cos(QPointF point)
     return x / sqrt(x*x + y*y);
 }
 
+int QVPEllipse::getB() const
+{
+    return m_b;
+}
+
+void QVPEllipse::setB(int b)
+{
+    m_b = b;
+    update();
+}
+
+int QVPEllipse::getA() const
+{
+    return m_a;
+}
+
+void QVPEllipse::setA(int a)
+{
+    m_a = a;
+    update();
+}
+
+QPointF QVPEllipse::getCenter() const
+{
+    return m_center;
+}
+
+void QVPEllipse::setCenter(const QPointF &center)
+{
+    m_center = center;
+    update();
+}
+
 
 
 

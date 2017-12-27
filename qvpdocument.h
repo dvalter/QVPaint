@@ -34,6 +34,9 @@ public:
 
 public slots:
     void setEditorMode(QVP::editorMode em);
+    void receiveParams(QColor color, int width, QPointF first, QPointF last,
+                     float a, float b, float ang1, float ang2);
+    void acceptParamsClose();
 
 private:
     QList<QVPShape*> m_shapesList;

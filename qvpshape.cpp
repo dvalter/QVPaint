@@ -16,6 +16,28 @@ QVPShape::~QVPShape()
     }
 }
 
+QColor QVPShape::getColor() const
+{
+    return m_penColor;
+}
+
+void QVPShape::setColor(const QColor &penColor)
+{
+    m_penColor = penColor;
+    update();
+}
+
+void QVPShape::setWidth(int width)
+{
+    m_width = width;
+    update();
+}
+
+int QVPShape::getWidth() const
+{
+    return m_width;
+}
+
 void QVPShape::select(bool state)
 {
     if (m_selected != state){

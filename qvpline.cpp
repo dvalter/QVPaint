@@ -218,6 +218,28 @@ void QVPLine::update()
     m_rasterized = new QVPRasterizedShape(m_shapePoints, color, m_width);
 }
 
+QPointF QVPLine::getLast() const
+{
+    return m_lastPoint;
+}
+
+QPointF QVPLine::getFirst() const
+{
+    return m_firstPoint;
+}
+
+void QVPLine::setLast(const QPointF &lastPoint)
+{
+    m_lastPoint = lastPoint;
+    update();
+}
+
+void QVPLine::setFirst(const QPointF &firstPoint)
+{
+    m_firstPoint = firstPoint;
+    update();
+}
+
 
 
 void QVPLine::handleMousePressEvent(QMouseEvent * me)

@@ -20,10 +20,20 @@ public:
     virtual void move(QPointF vec) override;
     virtual QList<QVPShape *> cutLine(QPointF first, QPointF last) override;
 
-//    virtual QList<QVPShape *> cutRect(QPointF first, QPointF last) override { return QList<QVPShape *>();}
+    QPointF getFirst() const;
+    QPointF getLast() const;
 
-    const QPointF& getFirst() { return m_firstPoint; }
-    const QPointF& getLast() { return m_lastPoint; }
+    void setFirst(const QPointF &firstPoint);
+    void setLast(const QPointF &lastPoint);
+
+
+
+
+
+
+
+
+
 
 
 protected:
