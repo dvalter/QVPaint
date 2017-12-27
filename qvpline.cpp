@@ -118,20 +118,23 @@ static bool lineSegementsIntersect(Vector p, Vector p2, Vector q, Vector q2,
     return false;
 }
 
-QVPLine::QVPLine(QColor penColor):
-    QVPShape(nullptr, penColor)
+QVPLine::QVPLine(QColor penColor, bool rectangle):
+    QVPShape(nullptr, penColor),
+    m_rectangle(rectangle)
 {
 
 }
 
-QVPLine::QVPLine(QObject * parent, QColor penColor):
-    QVPShape(parent, penColor)
+QVPLine::QVPLine(QObject * parent, QColor penColor, bool rectangle):
+    QVPShape(parent, penColor),
+    m_rectangle(rectangle)
 {
 
 }
 
-QVPLine::QVPLine(QObject * parent):
-    QVPShape(parent, QVP::penColor)
+QVPLine::QVPLine(QObject * parent, bool rectangle):
+    QVPShape(parent, QVP::penColor),
+    m_rectangle(rectangle)
 {
 
 }
@@ -147,6 +150,7 @@ QVPLine::QVPLine(QObject *parent, QColor penColor, QPointF first, QPointF last, 
 void bresenham_line(QVector<QPoint>& line, int x1, int y1, int x2, int y2)
 {
 //    QVector<QPoint> line;
+//    qDebug() << "(" << x1 << "," << y1 << ")->(" << x2 << "," << y2 << ")";
     const int deltaX = abs(x2 - x1);
     const int deltaY = abs(y2 - y1);
     const int signX = x1 < x2 ? 1 : -1;
@@ -189,9 +193,24 @@ void QVPLine::update()
     }
 
     m_shapePoints->clear();
-    bresenham_line(*m_shapePoints,
+    if (!m_rectangle){
+        bresenham_line(*m_shapePoints,
                 m_firstPoint.x(), m_firstPoint.y(),
                 m_lastPoint.x(), m_lastPoint.y());
+    } else {
+        bresenham_line(*m_shapePoints,
+                m_firstPoint.x(), m_firstPoint.y(),
+                m_lastPoint.x(), m_firstPoint.y());
+        bresenham_line(*m_shapePoints,
+                m_lastPoint.x(), m_firstPoint.y(),
+                m_lastPoint.x(), m_lastPoint.y());
+        bresenham_line(*m_shapePoints,
+                m_lastPoint.x(), m_lastPoint.y(),
+                m_firstPoint.x(), m_lastPoint.y());
+        bresenham_line(*m_shapePoints,
+                m_firstPoint.x(), m_lastPoint.y(),
+                m_firstPoint.x(), m_firstPoint.y());
+    }
 
     if (m_rasterized){
         delete m_rasterized;
@@ -237,9 +256,10 @@ QString QVPLine::toString()
     std::stringstream ss;
     ss << "L;" << m_firstPoint.x() << ";" << m_firstPoint.y() << ";" <<
           m_lastPoint.x() << ";" << m_lastPoint.y() << ";" <<
-          QString("%1%2%3").arg(m_penColor.red() / 0x10, 0, 16)
-          .arg(m_penColor.green() / 0x10, 0, 16)
-          .arg(m_penColor.blue() / 0x10, 0, 16).toStdString() << ";" << m_width << "\n";
+          QString("%1").arg(((m_penColor.red() * 7 / 255) << 5 |
+                              m_penColor.green() * 7 / 255 << 2 |
+                              m_penColor.blue() * 3 / 255), 0, 8
+                            ).toStdString() << ";" << m_width << "\n";
     return QString::fromStdString(std::string(ss.str()));
 }
 
@@ -263,6 +283,8 @@ QList<QVPShape *> QVPLine::cutLine(QPointF first, QPointF last)
         newShapes.append(new QVPLine(parent(), m_penColor, m_firstPoint, res, m_width));
         newShapes.append(new QVPLine(parent(), m_penColor, res, m_lastPoint, m_width));
         m_lastPoint = res;
+    } else {
+        newShapes.append(new QVPLine(parent(), m_penColor, m_firstPoint, m_lastPoint, m_width));
     }
     return newShapes;
 }

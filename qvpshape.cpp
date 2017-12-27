@@ -36,3 +36,23 @@ int QVPShape::testPoint(QPoint point)
     }
     return min;
 }
+
+QList<QVPShape *> QVPShape::cutRect(QPointF first, QPointF last)
+{
+    QList<QVPShape *> result;
+    QList<QVPShape *> a = cutLine(first, QPoint(last.x(), first.y()));
+    for (auto shape : a){
+        QList<QVPShape *> b = shape->cutLine(QPoint(last.x(), first.y()) , last);
+        delete shape;
+        for (auto shape : b){
+            QList<QVPShape *> c = shape->cutLine(last , QPoint(first.x(), last.y()));
+            delete shape;
+            for (auto shape : c){
+                QList<QVPShape *> d = shape->cutLine(QPoint(first.x(), last.y()) , first);
+                result.append(d);
+                delete shape;
+            }
+        }
+    }
+    return result;
+}

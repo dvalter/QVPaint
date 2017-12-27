@@ -11,7 +11,7 @@ public:
     explicit QVPEllipse(QObject *parent = nullptr);
     QVPEllipse(QObject *parent, QColor penColor);
     QVPEllipse(QColor penColor);
-    QVPEllipse(QObject *parent, QColor penColor, QPointF center, float a, float b, int width=1);
+    QVPEllipse(QObject *parent, QColor penColor, QPointF center, float a, float b, int width=2);
     virtual void handleMouseMoveEvent(QMouseEvent * me) override;
     virtual void handleMousePressEvent(QMouseEvent * me) override;
     virtual void handleMouseReleaseEvent(QMouseEvent * me) override;
@@ -19,7 +19,7 @@ public:
     virtual QString toString() override;
     virtual void move(QPointF vec) override;
     virtual QList<QVPShape *> cutLine(QPointF first, QPointF last) override;
-    virtual QList<QVPShape *> cutRect(QPointF first, QPointF last) override { return QList<QVPShape *>();}
+    virtual QList<QVPShape *> cutRect(QPointF first, QPointF last) override;
 
 protected:
     virtual void update() override;

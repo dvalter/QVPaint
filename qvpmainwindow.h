@@ -26,7 +26,7 @@ public slots:
     void save();
     void resetToSelection();
     void putMessage(QString text, bool isError);
-
+    void openNewWindow(QWidget * window);
 
 
 private:

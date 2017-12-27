@@ -88,9 +88,10 @@ QString QVPDot::toString()
 {
     std::stringstream ss;
     ss << "D;" << m_firstPoint.x() << ";" << m_firstPoint.y() << ";" <<
-          QString("%1%2%3").arg(m_penColor.red() / 0x10, 0, 16)
-          .arg(m_penColor.green() / 0x10, 0, 16)
-          .arg(m_penColor.blue() / 0x10, 0, 16).toStdString() << ";" << m_width << "\n";
+          QString("%1").arg(((m_penColor.red() * 7 / 255) << 5 |
+                              m_penColor.green() * 7 / 255 << 2 |
+                              m_penColor.blue() * 3 / 255), 0, 8
+                            ).toStdString() << ";" << m_width << "\n";
     return QString::fromStdString(std::string(ss.str()));
 }
 
@@ -99,4 +100,12 @@ void QVPDot::move(QPointF vec)
     m_firstPoint.rx() += vec.x();
     m_firstPoint.ry() += vec.y();
     update();
+}
+
+QList<QVPShape *> QVPDot::cutLine(QPointF first, QPointF last)
+{
+    if (first.x() || last.x())
+       return QList<QVPShape *>({(QVPShape*)new QVPDot(parent(), m_penColor, m_firstPoint)});
+    else
+        return QList<QVPShape *>({(QVPShape*)new QVPDot(parent(), m_penColor, m_firstPoint)});
 }

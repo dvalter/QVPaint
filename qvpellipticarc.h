@@ -14,7 +14,7 @@ public:
     explicit QVPEllipticArc(QObject *parent = nullptr);
     QVPEllipticArc(QObject *parent, QColor penColor);
     QVPEllipticArc(QColor penColor);
-    QVPEllipticArc(QObject *parent, QColor penColor, QPointF center, float a, float b, float a1, float a2, int width = 1);
+    QVPEllipticArc(QObject *parent, QColor penColor, QPointF center, float a, float b, float a1, float a2, int width = 2);
     virtual void handleMouseMoveEvent(QMouseEvent * me) override;
     virtual void handleMousePressEvent(QMouseEvent * me) override;
     virtual void handleMouseReleaseEvent(QMouseEvent * me) override;
@@ -23,7 +23,7 @@ public:
     virtual QString toString() override;
     virtual void move(QPointF vec) override;
     virtual QList<QVPShape *> cutLine(QPointF first, QPointF last) override;
-    virtual QList<QVPShape *> cutRect(QPointF first, QPointF last) override { return QList<QVPShape *>();}
+//    virtual QList<QVPShape *> cutRect(QPointF first, QPointF last) override { return QList<QVPShape *>();}
 
 protected:
     virtual void update() override;

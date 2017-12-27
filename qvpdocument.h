@@ -8,9 +8,10 @@
 #include "qvpline.h"
 #include "qvpellipse.h"
 #include "qvpellipticarc.h"
+#include "qvpshapeactions.h"
 
 
-class QVPDocument : public QLabel
+class QVPDocument : public QWidget
 {
     Q_OBJECT
 public:
@@ -29,6 +30,7 @@ private:
     QLabel* m_imgLbl;
     qint8 m_counter = 0;
     QVP::editorMode m_currentMode = QVP::drawLine;
+    QVPShapeActions* m_shapeActions = nullptr;
 
     bool previousWasFail = false;
 
@@ -50,6 +52,7 @@ signals:
     void shapeSelected(bool state);
     void switchToSelection();
     void sendMsgToUI(QString text, bool isError);
+    void showSetupWindow(QWidget* window);
 
 };
 

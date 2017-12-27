@@ -8,10 +8,10 @@ class QVPLine : public QVPShape
     Q_OBJECT
 
 public:
-    explicit QVPLine(QObject *parent = nullptr);
-    QVPLine(QObject *parent, QColor penColor);
-    QVPLine(QColor penColor);
-    QVPLine(QObject *parent, QColor penColor, QPointF first, QPointF last, int width=1);
+    explicit QVPLine(QObject *parent = nullptr, bool rectangle = false);
+    QVPLine(QObject *parent, QColor penColor, bool rectangle = false);
+    QVPLine(QColor penColor, bool rectangle = false);
+    QVPLine(QObject *parent, QColor penColor, QPointF first, QPointF last, int width=2);
     virtual void handleMouseMoveEvent(QMouseEvent * me) override;
     virtual void handleMousePressEvent(QMouseEvent * me) override;
     virtual void handleMouseReleaseEvent(QMouseEvent * me) override;
@@ -19,7 +19,8 @@ public:
     virtual QString toString() override;
     virtual void move(QPointF vec) override;
     virtual QList<QVPShape *> cutLine(QPointF first, QPointF last) override;
-    virtual QList<QVPShape *> cutRect(QPointF first, QPointF last) override { return QList<QVPShape *>();}
+
+//    virtual QList<QVPShape *> cutRect(QPointF first, QPointF last) override { return QList<QVPShape *>();}
 
     const QPointF& getFirst() { return m_firstPoint; }
     const QPointF& getLast() { return m_lastPoint; }
@@ -32,6 +33,7 @@ private:
 
     QPointF m_firstPoint;
     QPointF m_lastPoint;
+    bool m_rectangle = false;
 
 };
 //QVector<QPoint> bresenham_line(int x1, int y1, int x2, int y2);

@@ -22,8 +22,9 @@ public:
     virtual QString toString() = 0;
     virtual void move(QPointF vec) = 0;
     virtual QList<QVPShape *> cutLine(QPointF first, QPointF last) = 0;
-    virtual QList<QVPShape *> cutRect(QPointF first, QPointF last) = 0;
-
+    virtual QList<QVPShape *> cutRect(QPointF first, QPointF last);
+    QColor getColor() { return m_penColor; }
+    int getWidth() { return m_width; }
 
     ~QVPShape();
 signals:
@@ -42,7 +43,7 @@ protected:
     bool m_mousePressed = false;
     bool m_selected = false;
     QVPRasterizedShape* m_rasterized = new QVPRasterizedShape;
-    int m_width = 1;
+    int m_width = 2;
 
 
 };

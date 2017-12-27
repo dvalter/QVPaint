@@ -14,7 +14,7 @@ QVPMainWindow::QVPMainWindow(QWidget *parent)
     : QMainWindow(parent),
       m_scrollArea(new QScrollArea(this)),
       m_leftToolBar(new QToolBar("Tools")),
-      m_mainDocument(new QVPDocument),
+      m_mainDocument(new QVPDocument(this)),
       m_coordXlbl(new QLabel(this)),
       m_coordYlbl(new QLabel(this)),
       m_toolLbl(new QLabel(this)),
@@ -48,6 +48,8 @@ QVPMainWindow::QVPMainWindow(QWidget *parent)
     connect(m_mainDocument, &QVPDocument::updateCoord, this, &QVPMainWindow::coordUpdated);
     connect(m_mainDocument, &QVPDocument::switchToSelection, this, &QVPMainWindow::resetToSelection);
     connect(m_mainDocument, &QVPDocument::sendMsgToUI, this, &QVPMainWindow::putMessage);
+    connect(m_mainDocument, &QVPDocument::showSetupWindow, this, &QVPMainWindow::openNewWindow);
+    resetToSelection();
 }
 
 
@@ -104,6 +106,7 @@ void QVPMainWindow::initToolbar(QToolBar * toolBar, QList<QVPToolPair > elements
         }
 
         if (counter > 4){
+            act->setEnabled(false);
             QObject::connect(m_mainDocument, &QVPDocument::shapeSelected, act, &QVPAction::enable);
         }
         counter++;
@@ -169,4 +172,9 @@ void QVPMainWindow::putMessage(QString text, bool isError)
     }
     m_messageLbl->setText(text);
     qDebug() << text << " " << isError;
+}
+void QVPMainWindow::openNewWindow(QWidget *wgt)
+{
+    qDebug() << wgt;
+    wgt->show();
 }

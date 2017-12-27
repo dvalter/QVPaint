@@ -8,7 +8,7 @@ QColor colorFrom8BitStr(QString str);
 
 
 QVPDocument::QVPDocument(QWidget* parent) :
-    QLabel(parent),
+    QWidget(parent),
     m_mainImage(new QImage(QVP::imageWigth, QVP::imageHeight, QImage::Format_ARGB32_Premultiplied)),
     m_imgLbl(new QLabel)
 {
@@ -104,6 +104,12 @@ void QVPDocument::mousePressEvent(QMouseEvent* me)
                 emit switchToSelection();
 
             }
+        } elif (m_currentMode == QVP::clipRectangle){
+            emit sendMsgToUI("Нарисуйте прямоугольник", false);
+
+            m_tmpShape = new QVPLine(this, true);
+            m_tmpShape->handleMousePressEvent(me);
+            updateImage();
         }
     }
     qDebug() << "Shapes: " << m_shapesList.size();
@@ -118,7 +124,8 @@ void QVPDocument::mouseMoveEvent(QMouseEvent *me)
 
     if (m_currentMode == QVP::drawLine || m_currentMode == QVP::drawEllipse
             || m_currentMode == QVP::drawDot || m_currentMode == QVP::move
-            || m_currentMode == QVP::makeOrtho || m_currentMode == QVP::crossLine){
+            || m_currentMode == QVP::makeOrtho || m_currentMode == QVP::crossLine
+            || m_currentMode == QVP::clipRectangle){
         if (me->buttons() & Qt::LeftButton){
             m_tmpShape->handleMouseMoveEvent(me);
         }
@@ -191,19 +198,15 @@ void QVPDocument::mouseReleaseEvent(QMouseEvent *me)
         QPointF b = linePtr->getLast();
         QStack<QVPShape*> removeStack;
         QList<QVPShape*> addList;
-//        for(auto it = m_selectedShapesList.begin(); it != m_selectedShapesList.end(); it++){
         for (auto shape : m_selectedShapesList){
             auto tmpList = shape->cutLine(a, b);
             if (!tmpList.isEmpty()){
-
-                //delete m_shapesList.last();
-                //m_shapesList.removeLast();
                 removeStack.append(shape);
                 addList.append(tmpList);
             }
         }
         unSelect();
-        updateImage();
+
         while(!removeStack.isEmpty()){
             auto shape = removeStack.pop();
             delete shape;
@@ -211,6 +214,30 @@ void QVPDocument::mouseReleaseEvent(QMouseEvent *me)
         }
         m_shapesList.append(addList);
         emit switchToSelection();
+        updateImage();
+    } elif (m_currentMode == QVP::clipRectangle){
+        QVPLine* linePtr = qobject_cast<QVPLine *>(m_tmpShape);
+        QPointF a = linePtr->getFirst();
+        QPointF b = linePtr->getLast();
+        QStack<QVPShape*> removeStack;
+        QList<QVPShape*> addList;
+        for (auto shape : m_selectedShapesList){
+            auto tmpList = shape->cutRect(a, b);
+            if (!tmpList.isEmpty()){
+                removeStack.append(shape);
+                addList.append(tmpList);
+            }
+        }
+        unSelect();
+
+        while(!removeStack.isEmpty()){
+            auto shape = removeStack.pop();
+            delete shape;
+            m_shapesList.removeAll(shape);
+        }
+        m_shapesList.append(addList);
+        emit switchToSelection();
+        updateImage();
     }
 }
 
@@ -254,7 +281,24 @@ void QVPDocument::setEditorMode(QVP::editorMode em)
         delete m_tmpShape;
         m_tmpShape = nullptr;
     }
+
     updateImage();
+
+    if (m_currentMode == QVP::setUp){
+        if (m_selectedShapesList.empty()){
+            previousWasFail = true;
+            emit switchToSelection();
+        } else {
+            QVPShape* shape = m_selectedShapesList.last();
+            if (qobject_cast<QVPDot *>(shape)){
+                QVPDot* dot = qobject_cast<QVPDot *>(shape);
+                m_shapeActions = new QVPShapeActions(qobject_cast<QWidget*>(parent()), QVP::point, dot->getColor(), dot->getWidth(), dot->getCenter());
+                m_shapeActions->show();
+                //emit showSetupWindow(m_shapeActions);
+            }
+        }
+    }
+
 
 
 }
@@ -322,15 +366,11 @@ QColor colorFrom8BitStr(QString str)
 {
     qDebug() << str;
 
-    if (str.length() > 3){
-        throw std::runtime_error("bad color");
-    }
+    quint8  color = str.toInt(nullptr, 8);
 
-    std::string sstr = str.toLower().toStdString();
-
-    quint8 red =    str[0] != '0' ? ((sstr[0] > '9' ? sstr[0] - 'a' + 0xA : sstr[0] - '0') << 4) + 0xF  : 0x00;
-    quint8 green =  str[1] != '0' ? ((sstr[1] > '9' ? sstr[1] - 'a' + 0xA : sstr[1] - '0') << 4) + 0xF  : 0x00;
-    quint8 blue =   str[2] != '0' ? ((sstr[2] > '9' ? sstr[2] - 'a' + 0xA : sstr[2] - '0') << 4) + 0xF  : 0x00;
+    quint8 red =    ((color & 224) >> 5) * 255 / 7;
+    quint8 green =  ((color & 28) >> 2) * 255 / 7;
+    quint8 blue =   (color & 3) * 255 / 3;
 
     qDebug() << QString("%1.%2.%3").arg(red , 0, 16).arg(green , 0, 16).arg(blue , 0, 16);
     return QColor(red, green, blue, 0xFF);

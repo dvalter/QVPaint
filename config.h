@@ -27,6 +27,13 @@ namespace QVP
         setUp
     };
 
+    enum shapeType{
+        point,
+        line,
+        ellipse,
+        ellipticArc
+    };
+
     // default bg color
     const QColor backgroundColor(0xFF, 0xFF, 0xFF, 0xFF); // should be white
 

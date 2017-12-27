@@ -146,6 +146,7 @@ void QVPEllipticArc::update()
 
 
 
+
 void QVPEllipticArc::handleMousePressEvent(QMouseEvent * me)
 {
 
@@ -201,7 +202,7 @@ void QVPEllipticArc::handleMouseReleaseEvent(QMouseEvent * me)
     update();
 }
 
-inline float QVPEllipse::sin(QPointF point)
+inline float QVPEllipticArc::sin(QPointF point)
 {
     volatile float x = point.x() - m_center.x();
     volatile float y = point.y() - m_center.y();
@@ -210,7 +211,7 @@ inline float QVPEllipse::sin(QPointF point)
 }
 
 
-inline float QVPEllipse::cos(QPointF point)
+inline float QVPEllipticArc::cos(QPointF point)
 {
     volatile float x = point.x() - m_center.x();
     volatile float y = point.y() - m_center.y();
@@ -254,9 +255,10 @@ QString QVPEllipticArc::toString()
     std::stringstream ss;
     ss << "A;" << m_center.x() << ";" << m_center.y() << ";" <<
           m_a << ";" << m_b << ";" << m_ang1 << ";" << m_ang2 << ";" <<
-          QString("%1%2%3").arg(m_penColor.red() / 0x10, 0, 16)
-          .arg(m_penColor.green() / 0x10, 0, 16)
-          .arg(m_penColor.blue() / 0x10, 0, 16).toStdString() << ";" << m_width << "\n";
+          QString("%1").arg(((m_penColor.red() * 7 / 255) << 5 |
+                              m_penColor.green() * 7 / 255 << 2 |
+                              m_penColor.blue() * 3 / 255), 0, 8
+                            ).toStdString() << ";" << m_width << "\n";
     return QString::fromStdString(std::string(ss.str()));
 }
 
@@ -388,21 +390,19 @@ QList<QVPShape *> QVPEllipticArc::cutLine(QPointF first, QPointF last)
             } else {
                 angles.prepend(ang2);
             }
-            angles.prepend(m_ang1);
-            angles.append(m_ang2);
         }
-
+        angles.prepend(m_ang1);
+        angles.append(m_ang2);
+        qDebug() << "forloop::" << angles.size() - 1;
         for (int i = 0; i < angles.size() - 1; i++){
             newShapes.append(new QVPEllipticArc(parent(), m_penColor, m_center, m_a, m_b, angles[i], angles[(i + 1) % angles.size()], m_width));
         }
-    //        if (between(int1, first, last) && between(int2, first, last)){
-    //            float ang1 = angleFromSC(sin(int1), cos(int1));
-    //            float ang2 = angleFromSC(sin(int2), cos(int2));
-    //            newShapes.append(new QVPEllipticArc(parent(), m_penColor, m_center, m_a, m_b, ang1, ang2, m_width));
-    //            newShapes.append(new QVPEllipticArc(parent(), m_penColor, m_center, m_a, m_b, ang2, ang1, m_width));
-    //        }
+
+    } else {
+        qDebug() << "attaching itself";
+        newShapes.append(new QVPEllipticArc(parent(), m_penColor, m_center, m_a, m_b, m_ang1, m_ang2, m_width));
     }
 
-
+    Q_ASSERT(!newShapes.empty());
     return newShapes;
 }
