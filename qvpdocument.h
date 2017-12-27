@@ -63,6 +63,7 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent* me) override;
     virtual void paintEvent(QPaintEvent* event) override;
 
+
 signals:
     void updateCoord(QPoint coord);
     void shapeSelected(bool state);

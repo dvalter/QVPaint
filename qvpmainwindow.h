@@ -42,6 +42,8 @@ private:
     QActionGroup* m_toolActionGroup;
     QAction* m_selectAction = nullptr;
 
+protected:
+    virtual void keyPressEvent(QKeyEvent* ke) override;
 
     void initToolbar(QToolBar*, QList<QVPToolPair>, Qt::ToolBarArea);
     void initToolsList();

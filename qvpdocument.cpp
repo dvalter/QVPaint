@@ -241,6 +241,8 @@ void QVPDocument::mouseReleaseEvent(QMouseEvent *me)
     }
 }
 
+
+
 void QVPDocument::paintEvent(QPaintEvent *event)
 {
     const QRect paintRect = event->rect();

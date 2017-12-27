@@ -178,3 +178,14 @@ void QVPMainWindow::openNewWindow(QWidget *wgt)
     qDebug() << wgt;
     wgt->show();
 }
+
+void QVPMainWindow::keyPressEvent(QKeyEvent* ke)
+{
+    qDebug() << ke;
+    if (ke->key() == Qt::Key_Escape){
+        ke->accept();
+        resetToSelection();
+    } else {
+        ke->ignore();
+    }
+}
