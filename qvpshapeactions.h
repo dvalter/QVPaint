@@ -6,13 +6,34 @@
 #include "qvpshape.h"
 #include <limits>
 
+class QVPColorGridWidget: public QWidget
+{
+    Q_OBJECT
+public:
+    explicit QVPColorGridWidget(QWidget* parent = nullptr): QWidget(parent) {}
+
+protected:
+    void closeEvent(QCloseEvent *event) {
+        emit closed();
+        event->ignore();
+    }
+
+signals:
+    void closed();
+};
+
+
 class QVPColorButton: public QPushButton
 {
     Q_OBJECT
 
 public:
-    QVPColorButton(QObject * parent, quint8 color);
+    QVPColorButton(quint8 color);
     quint8 getColor() { return m_color; }
+
+    virtual ~QVPColorButton(){
+        qDebug() << __FUNCTION__;
+    }
 
 signals:
     void changeColor(quint8 color);
@@ -30,7 +51,7 @@ private:
 
 };
 
-class QVPShapeActions : public QWidget
+class QVPShapeActions : public QMainWindow/*QWidget*/
 {
     Q_OBJECT
 public:
@@ -44,15 +65,24 @@ public:
                     QPointF center, float paramA, float paramB, float ang1, float ang2);
 
 
+
+    virtual ~QVPShapeActions(){
+        qDebug() << __FUNCTION__;
+    }
+
 signals:
 
 public slots:
     void showColorGrid();
     void setColor(quint8 color);
+    void hideColorGrid();
+    void saveColorGrid();
 private:
 
     void init(int width,
               QPointF firstCoord);
+
+    QWidget m_mainWgt;
 
     QVP::shapeType m_shapeType;
     QGridLayout m_gridLayout;
@@ -84,10 +114,19 @@ private:
     QLabel m_colorLbl;
     QColor m_color;
     QColor m_newColor;
+
     QVPColorButton m_colorButton;
     bool m_colorConsistency = true;
-    QList<QPushButton *> m_colorGridButtons;
-    QWidget m_colorSelectionWidget;
+    QList<QVPColorButton *> m_colorGridButtons;
+    QVPColorGridWidget m_colorSelectionWidget;
+
+    QPushButton m_confirmButton;
+    QPushButton m_cancelButton;
+
+    QPushButton m_colorConfirmButton;
+    QPushButton m_colorCancelButton;
+
+
 
 };
 

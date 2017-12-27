@@ -29,42 +29,42 @@ QPixmap pixmapFromColor(QColor color)
 
 QVPShapeActions::QVPShapeActions(QWidget *parent, QVP::shapeType type, QColor color, int width,
                 QPointF firstCoord):
-    QWidget(parent),
+    QMainWindow(parent),
     m_shapeType(type),
     m_color(color),
     m_newColor(color),
-    m_colorButton(nullptr, colorTo844(color))
+    m_colorButton(colorTo844(color))
 
 {
     init(width, firstCoord);
 }
 QVPShapeActions::QVPShapeActions(QWidget *parent, QVP::shapeType type, QColor color, int width,
                 QPointF firstCoord, QPointF lastCoord):
-    QWidget(parent),
+    QMainWindow(parent),
     m_shapeType(type),
     m_color(color),
     m_newColor(color),
-    m_colorButton(nullptr, colorTo844(color))
+    m_colorButton(colorTo844(color))
 {
     init(width, firstCoord);
 }
 QVPShapeActions::QVPShapeActions(QWidget *parent, QVP::shapeType type, QColor color, int width,
                 QPointF center, float paramA, float paramB):
-    QWidget(parent),
+    QMainWindow(parent),
     m_shapeType(type),
     m_color(color),
     m_newColor(color),
-    m_colorButton(nullptr, colorTo844(color))
+    m_colorButton(colorTo844(color))
 {
     init(width, center);
 }
 QVPShapeActions::QVPShapeActions(QWidget *parent, QVP::shapeType type, QColor color, int width,
                 QPointF center, float paramA, float paramB, float ang1, float ang2):
-    QWidget(parent),
+    QMainWindow(parent),
     m_shapeType(type),
     m_color(color),
     m_newColor(color),
-    m_colorButton(nullptr, colorTo844(color))
+    m_colorButton(colorTo844(color))
 {
     init(width, center);
 }
@@ -75,6 +75,7 @@ void QVPShapeActions::init(int width, QPointF firstCoord)
     m_gridLayout.addWidget(&m_colorLbl, 0, 0);
     m_gridLayout.addWidget(&m_colorButton, 0, 1);
     connect(&m_colorButton, &QPushButton::clicked, this, &QVPShapeActions::showColorGrid);
+    connect(&m_colorSelectionWidget, &QVPColorGridWidget::closed, this, &QVPShapeActions::hideColorGrid);
 
     QGridLayout* grid = new QGridLayout(&m_colorSelectionWidget);
     for (quint8 i = 0; i < 4; i++) {
@@ -82,7 +83,7 @@ void QVPShapeActions::init(int width, QPointF firstCoord)
             for (quint8 k = 0; k < 8; k++) {
 
                 quint8 clr844 = (k << 5) | (j << 2) | i;
-                QVPColorButton* btn = new QVPColorButton(nullptr, (k << 5) | (j << 2) | i);
+                QVPColorButton* btn = new QVPColorButton((k << 5) | (j << 2) | i);
                 btn->setCheckable(true);
                 if (colorTo844(m_color) == clr844){
                     btn->setChecked(true);
@@ -97,24 +98,69 @@ void QVPShapeActions::init(int width, QPointF firstCoord)
             }
         }
     }
+
+    m_colorCancelButton.setText("&Cancel");
+    m_colorConfirmButton.setText("&Confirm");
+    grid->addWidget(&m_colorConfirmButton, 17, 15);
+    grid->addWidget(&m_colorCancelButton, 17, 16);
+    connect(&m_colorConfirmButton, &QPushButton::clicked, this, &QVPShapeActions::saveColorGrid);
+    connect(&m_colorCancelButton, &QPushButton::clicked, this, &QVPShapeActions::hideColorGrid);
+
     m_colorSelectionWidget.setLayout(grid);
-    setLayout(&m_gridLayout);
+    m_colorSelectionWidget.setWindowTitle("Colors");
+
+    m_mainWgt.setLayout(&m_gridLayout);
+    setCentralWidget(&m_mainWgt);
+    setWindowTitle("Shape preferences");
 }
 
 void QVPShapeActions::showColorGrid()
 {
     m_colorConsistency = false;
+    m_colorSelectionWidget.setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     m_colorSelectionWidget.show();
+}
+
+void QVPShapeActions::hideColorGrid()
+{
+    qDebug() << "hiding collor grid";
+    m_colorConsistency = true;
+    m_colorSelectionWidget.hide();
+    m_newColor = m_color;
+    quint8 color = colorTo844(m_color);
+
+    for (auto btn : m_colorGridButtons){
+        if (btn->getColor() != color){
+            btn->setChecked(false);
+        } else {
+            btn->setChecked(true);
+        }
+    }
+}
+
+void QVPShapeActions::saveColorGrid()
+{
+    qDebug() << "saving collor grid";
+    m_color = m_newColor;
+    m_colorConsistency = true;
+    m_colorSelectionWidget.hide();
 }
 
 void QVPShapeActions::setColor(quint8 color)
 {
     m_newColor = colorFrom884(color);
+    for (auto btn : m_colorGridButtons){
+        if (btn->getColor() != color){
+            btn->setChecked(false);
+        }
+    }
 }
 
-QVPColorButton::QVPColorButton(QObject * parent, quint8 color) : m_color(color)
+QVPColorButton::QVPColorButton(quint8 color) : m_color(color)
 {
     setFlat(true);
     setIcon(QIcon(pixmapFromColor(colorFrom884(m_color))));
     connect(this, &QPushButton::toggled, this, &QVPColorButton::checkButton);
 }
+
+

@@ -9,8 +9,8 @@ QColor colorFrom8BitStr(QString str);
 
 QVPDocument::QVPDocument(QWidget* parent) :
     QWidget(parent),
-    m_mainImage(new QImage(QVP::imageWigth, QVP::imageHeight, QImage::Format_ARGB32_Premultiplied)),
-    m_imgLbl(new QLabel)
+    m_mainImage(new QImage(QVP::imageWigth, QVP::imageHeight, QImage::Format_ARGB32_Premultiplied))/*,
+    m_imgLbl(new QLabel)*/
 {
     qDebug() << __FUNCTION__;
     m_mainImage->fill(QVP::backgroundColor);
@@ -292,7 +292,7 @@ void QVPDocument::setEditorMode(QVP::editorMode em)
             QVPShape* shape = m_selectedShapesList.last();
             if (qobject_cast<QVPDot *>(shape)){
                 QVPDot* dot = qobject_cast<QVPDot *>(shape);
-                m_shapeActions = new QVPShapeActions(qobject_cast<QWidget*>(parent()), QVP::point, dot->getColor(), dot->getWidth(), dot->getCenter());
+                m_shapeActions = new QVPShapeActions(nullptr, QVP::point, dot->getColor(), dot->getWidth(), dot->getCenter());
                 m_shapeActions->show();
                 //emit showSetupWindow(m_shapeActions);
             }

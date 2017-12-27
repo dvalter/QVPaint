@@ -19,6 +19,19 @@ public:
     bool saveToFile(const QString& fileName);
     bool loadFromFile(const QString& fileName);
 
+    ~QVPDocument(){
+        for (auto shape : m_shapesList){
+            delete shape;
+        }
+        if (m_tmpShape != nullptr){
+            delete m_tmpShape;
+        }
+        delete m_mainImage;
+//        if (m_shapeActions != nullptr){
+//            delete m_shapeActions;
+//        }
+    }
+
 public slots:
     void setEditorMode(QVP::editorMode em);
 
@@ -27,7 +40,7 @@ private:
     QList<QVPShape*> m_selectedShapesList;
     QVPShape* m_tmpShape = nullptr;
     QImage* m_mainImage;
-    QLabel* m_imgLbl;
+//    QLabel* m_imgLbl;
     qint8 m_counter = 0;
     QVP::editorMode m_currentMode = QVP::drawLine;
     QVPShapeActions* m_shapeActions = nullptr;

@@ -11,6 +11,9 @@ QVPShape::QVPShape(QObject *parent, QColor penColor, int width) :
 QVPShape::~QVPShape()
 {
     delete m_shapePoints;
+    if (m_rasterized){
+        delete m_rasterized;
+    }
 }
 
 void QVPShape::select(bool state)
