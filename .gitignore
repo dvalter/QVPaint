@@ -1,0 +1,8 @@
+.~lock*
+*.log
+*.aux
+*.toc
+*.synctex.gz
+*.backup
+trash/
+latex/pic/old

@@ -16,6 +16,11 @@ QVPShape::~QVPShape()
     }
 }
 
+bool QVPShape::getSelected() const
+{
+    return m_selected;
+}
+
 QColor QVPShape::getColor() const
 {
     return m_penColor;

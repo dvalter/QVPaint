@@ -32,14 +32,17 @@ void QVPDocument::searchPixel(QPoint point)
         if (dist < minDist){
             selectedShape = shape;
             minDist = dist;
-        } /*else {
-            shape->select(false);
-        }*/
+        }
     }
-    if (selectedShape){
+    if (selectedShape && !selectedShape->getSelected()){
         selectedShape->select(true);
         m_selectedShapesList.append(selectedShape);
         emit shapeSelected(true);
+    } elif(selectedShape) {
+        selectedShape->select(false);
+        m_selectedShapesList.removeAll(selectedShape);
+        if(m_selectedShapesList.empty())
+            emit shapeSelected(false);
     }
     update();
 }
@@ -454,7 +457,6 @@ void QVPDocument::acceptParamsClose()
 {
     if(m_shapeActions) {
         m_shapeActions->close();
-//        delete m_shapeActions;
         m_shapeActions->deleteLater();
         m_shapeActions = nullptr;
     }

@@ -39,6 +39,8 @@ public:
 
 
 
+    bool getSelected() const;
+
 signals:
 
 public slots:

@@ -149,8 +149,7 @@ QVPLine::QVPLine(QObject *parent, QColor penColor, QPointF first, QPointF last, 
 
 void bresenham_line(QVector<QPoint>& line, int x1, int y1, int x2, int y2)
 {
-//    QVector<QPoint> line;
-//    qDebug() << "(" << x1 << "," << y1 << ")->(" << x2 << "," << y2 << ")";
+
     const int deltaX = abs(x2 - x1);
     const int deltaY = abs(y2 - y1);
     const int signX = x1 < x2 ? 1 : -1;
@@ -176,7 +175,7 @@ void bresenham_line(QVector<QPoint>& line, int x1, int y1, int x2, int y2)
             y1 += signY;
         }
     }
-    //return line;
+
 }
 
 void QVPLine::update()

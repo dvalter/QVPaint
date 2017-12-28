@@ -41,13 +41,10 @@ QVPEllipse::QVPEllipse(QObject *parent, QColor penColor, QPointF center,
 
 void bresenham_ellipse(QVector<QPoint>& ellipse, int x, int y, int a, int b)
 {
-//    QVector<QPoint> ellipse;
     if (!a && !b){
         ellipse.append(QPoint(x,y));
         return;
     }
-//    int col,row;
-//    long a_square,b_square,two_a_square,two_b_square,four_a_square,four_b_square,d;
 
     long b_square = b * b;
     long a_square = a * a;
@@ -85,36 +82,6 @@ void bresenham_ellipse(QVector<QPoint>& ellipse, int x, int y, int a, int b)
         d += two_a_square*(3-(row <<1));
     }
 
-
-    /*row = b;
-    col = 0;
-    d = two_a_square * ((row - 1) * (row)) + a_square + two_b_square * (1 - a_square);
-    while(a_square*(row)>b_square*(col)){
-        ellipse.append(QPoint(col+x,y-row));
-//        ellipse[2].append(QPoint(x-col,row+y));
-//        ellipse[3].append(QPoint(x-col,y-row));
-        if (d >= 0){
-            row--;
-            d -= four_a_square * (row);
-        }
-        d += two_b_square * (3 + (col << 1));
-        col++;
-    }
-    d = two_b_square * (col + 1) * col + two_a_square *
-            (row * (row - 2) + 1) + (1 - two_a_square) * b_square;
-    while ((row) + 1){
-        ellipse.append(QPoint(col+x,y-row));
-//        ellipse[2].append(QPoint(x-col,row+y));
-//        ellipse[3].append(QPoint(x-col,y-row));
-        if (d <= 0){
-            col++;
-            d += four_b_square*col;
-        }
-        row--;
-        d += two_a_square*(3-(row <<1));
-    }*/
-
-//    return ellipse;
 }
 
 
@@ -351,9 +318,6 @@ inline bool between(const QPointF& a, const QPointF& first, const QPointF& last)
     bool o = a.x() >= min(first.x(), last.x());
     bool p = a.y() >= min(first.y(), last.y());
     return m && n && o && p;
-
-//    return a.x() < max(first.x(), last.x()) && a.y() < max(first.y(), last.y()) &&
-//            a.x() > min(first.x(), last.x()) && a.y() > min(first.y(), last.y());
 }
 
 QList<QVPShape *> QVPEllipse::cutLine(QPointF first, QPointF last)
@@ -362,24 +326,16 @@ QList<QVPShape *> QVPEllipse::cutLine(QPointF first, QPointF last)
     float x1, x2, y1, y2;
     QList<QVPShape *> newShapes;
     if (ellipseIntersectLine(m_a, m_b, m_center.x(), m_center.y(), first.x(), first.y(),
-                             last.x(), last.y(), x1, x2, y1, y2/*int1.rx(), int2.rx(), int1.ry(),int2.ry()*/)){
-//        int1(QPointF(x1, y1));
-//        int2(QPointF(x2, y2));
+                             last.x(), last.y(), x1, x2, y1, y2)){
         QPointF int1(x1, y1), int2(x2, y2);
         qDebug() << int1 << " " << between(int1, first, last) << " " << int2 << " " << between(int2, first, last)/* << int1==int2*/;
         if (between(int1, first, last) && between(int2, first, last)){
             volatile float ang1 = angleFromSC(sin(int1), cos(int1));
-            //qDebug() << ang1;
             volatile float ang2 = angleFromSC(sin(int2), cos(int2));
-            //qDebug() << ang2;
             newShapes.append(new QVPEllipticArc(parent(), m_penColor, m_center, m_a, m_b, ang1, ang2, m_width));
             newShapes.append(new QVPEllipticArc(parent(), m_penColor, m_center, m_a, m_b, ang2, ang1, m_width));
-        } /*else {
-            newShapes.append(new QVPEllipse(parent(), m_penColor, m_center, m_a, m_b, m_width));
-        }*/
-    } /*else {
-        newShapes.append(new QVPEllipse(parent(), m_penColor, m_center, m_a, m_b, m_width));
-    }*/
+        }
+    }
     return newShapes;
 }
 

@@ -43,15 +43,13 @@ QVPEllipticArc::QVPEllipticArc(QObject *parent, QColor penColor, QPointF center,
 inline void QVPEllipticArc::appendPoint(QPoint point, QVector<QPoint>& vec)
 {
     if (m_state < 4 || checkPoint(point)){
-        //qDebug() << angleFromSC(sin(point), cos(point));
         vec.append(point);
     }
 }
 
  void QVPEllipticArc::bresenham_elliptic_arc(QVector<QPoint>& ellipse, int x, int y, int a, int b)
 {
-//    qDebug() << "andgle1=" << m_ang1 << " angle2=" << m_ang2;
-//    QVector<QPoint> ellipse;
+
     if (!a && !b){
         ellipse.append(QPoint(x,y));
         return;
@@ -96,7 +94,6 @@ inline void QVPEllipticArc::appendPoint(QPoint point, QVector<QPoint>& vec)
         d += two_a_square*(3-(row <<1));
     }
 
-    //eturn ellipse;
 }
 
 
@@ -137,14 +134,6 @@ void QVPEllipticArc::update()
     }
     m_rasterized = new QVPRasterizedShape(m_shapePoints, color, m_width);
 }
-
-
-
-
-
-
-
-
 
 
 void QVPEllipticArc::handleMousePressEvent(QMouseEvent * me)
@@ -206,7 +195,6 @@ inline float QVPEllipticArc::sin(QPointF point)
 {
     volatile float x = point.x() - m_center.x();
     volatile float y = point.y() - m_center.y();
-//    return y*Q_rsqrt(x*x + y*y);
     return y / sqrt(x*x + y*y);
 }
 
@@ -215,7 +203,6 @@ inline float QVPEllipticArc::cos(QPointF point)
 {
     volatile float x = point.x() - m_center.x();
     volatile float y = point.y() - m_center.y();
-//    return x*Q_rsqrt(x*x + y*y);
     return x / sqrt(x*x + y*y);
 }
 
@@ -412,8 +399,6 @@ inline bool between(const QPointF& a, const QPointF& first, const QPointF& last)
     bool p = a.y() >= min(first.y(), last.y());
     return m && n && o && p;
 
-//    return a.x() < max(first.x(), last.x()) && a.y() < max(first.y(), last.y()) &&
-//            a.x() > min(first.x(), last.x()) && a.y() > min(first.y(), last.y());
 }
 
 QList<QVPShape *> QVPEllipticArc::cutLine(QPointF first, QPointF last)
@@ -422,12 +407,9 @@ QList<QVPShape *> QVPEllipticArc::cutLine(QPointF first, QPointF last)
     float x1, x2, y1, y2;
     QList<QVPShape *> newShapes;
     if (ellipseIntersectLine(m_a, m_b, m_center.x(), m_center.y(), first.x(), first.y(),
-                             last.x(), last.y(), x1, x2, y1, y2/*int1.rx(), int2.rx(), int1.ry(),int2.ry()*/)){
-//        int1(QPointF(x1, y1));
-//        int2(QPointF(x2, y2));
+                             last.x(), last.y(), x1, x2, y1, y2)){
         QPointF int1(x1, y1), int2(x2, y2);
-        qDebug() << int1 << " " << between(int1, first, last) << " " << int2 << " " << between(int2, first, last)/* << int1==int2*/;
-        QList<float> angles; //({m_ang1, m_ang2});
+        QList<float> angles;
 
         float ang1 = angleFromSC(sin(int1), cos(int1));
         float ang2 = angleFromSC(sin(int2), cos(int2));
@@ -448,13 +430,11 @@ QList<QVPShape *> QVPEllipticArc::cutLine(QPointF first, QPointF last)
         }
         angles.prepend(m_ang1);
         angles.append(m_ang2);
-        qDebug() << "forloop::" << angles.size() - 1;
         for (int i = 0; i < angles.size() - 1; i++){
             newShapes.append(new QVPEllipticArc(parent(), m_penColor, m_center, m_a, m_b, angles[i], angles[(i + 1) % angles.size()], m_width));
         }
 
     } else {
-        qDebug() << "attaching itself";
         newShapes.append(new QVPEllipticArc(parent(), m_penColor, m_center, m_a, m_b, m_ang1, m_ang2, m_width));
     }
 
