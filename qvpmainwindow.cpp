@@ -1,26 +1,17 @@
 #include "qvpmainwindow.h"
-#include <stdlib.h>
 #include "qvpaction.h"
 
-QString msgLabelText(const QString& str)
-{
-    QString labelText = "<P><b><i><FONT COLOR='#ff0000' FONT SIZE = 4>";
-    labelText .append(str);
-    labelText .append("</i></b></P></br>");
-    return labelText;
-}
 
 QVPMainWindow::QVPMainWindow(QWidget *parent)
-    : QMainWindow(parent),
-      m_scrollArea(new QScrollArea(this)),
-      m_leftToolBar(new QToolBar("Tools")),
-      m_mainDocument(new QVPDocument(this)),
-      m_coordXlbl(new QLabel(this)),
-      m_coordYlbl(new QLabel(this)),
-      m_toolLbl(new QLabel(this)),
-      m_messageLbl(new QLabel(this)),
-      m_toolActionGroup(new QActionGroup(this))
-{
+        : QMainWindow(parent),
+          m_scrollArea(new QScrollArea(this)),
+          m_leftToolBar(new QToolBar("Tools")),
+          m_mainDocument(new QVPDocument(this)),
+          m_coordXlbl(new QLabel(this)),
+          m_coordYlbl(new QLabel(this)),
+          m_toolLbl(new QLabel(this)),
+          m_messageLbl(new QLabel(this)),
+          m_toolActionGroup(new QActionGroup(this)) {
 
     initToolsList();
     initToolbar(m_leftToolBar, m_toolsList, (Qt::LeftToolBarArea));
@@ -52,23 +43,20 @@ QVPMainWindow::QVPMainWindow(QWidget *parent)
 }
 
 
-void QVPMainWindow::coordUpdated(QPoint coord)
-{
+void QVPMainWindow::coordUpdated(QPoint coord) {
     m_coordXlbl->setText(QString().sprintf("%s: %4d", "X", coord.x()));
     m_coordYlbl->setText(QString().sprintf("%s: %4d", "Y", coord.y()));
 }
 
-QVPMainWindow::~QVPMainWindow()
-{
-    for (auto& act : m_toolActionGroup->actions()) {
+QVPMainWindow::~QVPMainWindow() {
+    for (auto &act : m_toolActionGroup->actions()) {
         m_toolActionGroup->removeAction(act);
         delete act;
     }
 
 }
 
-void QVPMainWindow::initToolsList()
-{
+void QVPMainWindow::initToolsList() {
     m_toolsList.append(QVPToolPair(QVP::selectShape, "Selection"));
     m_toolsList.append(QVPToolPair(QVP::drawDot, "Dot"));
     m_toolsList.append(QVPToolPair(QVP::drawLine, "Line"));
@@ -81,19 +69,18 @@ void QVPMainWindow::initToolsList()
     m_toolsList.append(QVPToolPair(QVP::setUp, "Set up shape"));
 }
 
-void QVPMainWindow::initToolbar(QToolBar * toolBar, QList<QVPToolPair > elements, Qt::ToolBarArea area)
-{
+void QVPMainWindow::initToolbar(QToolBar *toolBar, QList<QVPToolPair> elements, Qt::ToolBarArea area) {
     QMenu *const fileMenu = menuBar()->addMenu("&File");
     fileMenu->addAction("&Open...", this, SLOT(open()), QKeySequence::Open);
     fileMenu->addAction("&Save As...", this, SLOT(save()), QKeySequence::SaveAs);
     fileMenu->addSeparator();
-    fileMenu->addAction(tr("E&xit"),this, SLOT(close()), QKeySequence::Quit);
+    fileMenu->addAction(tr("E&xit"), this, SLOT(close()), QKeySequence::Quit);
 
     m_toolMenu = menuBar()->addMenu("&Tools");
 
     int counter = 0;
-    for (QVPToolPair mode : elements){
-        QVPAction* act = new QVPAction(QPixmap(":/" + mode.second + ".svg"), mode.second, mode.first);
+    for (QVPToolPair mode : elements) {
+        QVPAction *act = new QVPAction(QPixmap(":/" + mode.second + ".svg"), mode.second, mode.first);
         act->setCheckable(true);
         m_toolActionGroup->addAction(act);
 
@@ -103,12 +90,12 @@ void QVPMainWindow::initToolbar(QToolBar * toolBar, QList<QVPToolPair > elements
         QObject::connect(act, &QVPAction::toggled, this, &QVPMainWindow::updateMode);
         QObject::connect(act, &QVPAction::toggled, m_mainDocument, &QVPDocument::setEditorMode);
 
-        if (mode.first == QVP::selectShape){
+        if (mode.first == QVP::selectShape) {
             act->setChecked(true);
             m_selectAction = act;
         }
 
-        if (counter > 4){
+        if (counter > 4) {
             act->setEnabled(false);
             QObject::connect(m_mainDocument, &QVPDocument::shapeSelected, act, &QVPAction::enable);
         }
@@ -123,12 +110,11 @@ void QVPMainWindow::initToolbar(QToolBar * toolBar, QList<QVPToolPair > elements
     addToolBar(area, m_leftToolBar);
 }
 
-void QVPMainWindow::updateMode(QVP::editorMode mode)
-{
+void QVPMainWindow::updateMode(QVP::editorMode mode) {
 
     QString name("None");
-    for (QVPToolPair pair : m_toolsList){
-        if (pair.first == mode){
+    for (QVPToolPair pair : m_toolsList) {
+        if (pair.first == mode) {
             name = pair.second;
         }
     }
@@ -136,37 +122,34 @@ void QVPMainWindow::updateMode(QVP::editorMode mode)
 
 }
 
-void QVPMainWindow::open()
-{
+void QVPMainWindow::open() {
     const QString fileName =
-        QFileDialog::getOpenFileName(
-                this, "Open File", QDir::currentPath());
+            QFileDialog::getOpenFileName(
+                    this, "Open File", QDir::currentPath());
     if (!fileName.isEmpty()) {
         m_mainDocument->loadFromFile(fileName);
     }
 }
 
-void QVPMainWindow::save()
-{
+void QVPMainWindow::save() {
     const QString initialPath = QDir::currentPath() + "/untitled.qvpi";
 
     const QString fileName =
             QFileDialog::getSaveFileName(
-                this, "Save As", initialPath, "QVPI Files (*.qvpi);;All Files (*)");
+                    this, "Save As", initialPath, "QVPI Files (*.qvpi);;All Files (*)");
 
     if (!(!fileName.isEmpty() && m_mainDocument->saveToFile(fileName)))
         qCritical() << "FAILED TO SAVE";
 }
 
-void QVPMainWindow::resetToSelection(){
-    if (m_selectAction){
+void QVPMainWindow::resetToSelection() {
+    if (m_selectAction) {
         m_selectAction->setChecked(true);
     }
 }
 
-void QVPMainWindow::putMessage(QString text, bool isError)
-{
-    if (isError){
+void QVPMainWindow::putMessage(QString text, bool isError) {
+    if (isError) {
         m_messageLbl->setStyleSheet("font-weight: bold; color: red");
     } else {
         m_messageLbl->setStyleSheet("font-weight: regular; color: light gray");
@@ -174,16 +157,15 @@ void QVPMainWindow::putMessage(QString text, bool isError)
     m_messageLbl->setText(text);
     qDebug() << text << " " << isError;
 }
-void QVPMainWindow::openNewWindow(QWidget *wgt)
-{
+
+void QVPMainWindow::openNewWindow(QWidget *wgt) {
     qDebug() << wgt;
     wgt->show();
 }
 
-void QVPMainWindow::keyPressEvent(QKeyEvent* ke)
-{
+void QVPMainWindow::keyPressEvent(QKeyEvent *ke) {
     qDebug() << ke;
-    if (ke->key() == Qt::Key_Escape){
+    if (ke->key() == Qt::Key_Escape) {
         ke->accept();
         resetToSelection();
     } else {

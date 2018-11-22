@@ -1,25 +1,21 @@
 #include "qvpshapeactions.h"
-#include "qvpdocument.h"
-#include <math.h>
 
-QColor colorFrom884(quint8 eightBit)
-{
-    quint8 red8 = eightBit & 224;
-    red8 = (red8 >> 5) * 255 / 7;
-    quint8 green8 = eightBit & 28;
-    green8 = (green8 >> 2) * 255 / 7;
-    quint8 blue4 = eightBit & 3;
-    blue4 = blue4 * 255 / 3;
+QColor colorFrom884(quint8 eightBit) {
+    auto red8 = quint8(eightBit & 224u);
+    red8 = quint8((red8 >> 5) * 255u / 7u);
+    auto green8 = quint8(eightBit & 28u);
+    green8 = quint8((green8 >> 2) * 255u / 7u);
+    auto blue4 = quint8(eightBit & 3u);
+    blue4 = quint8(blue4 * 255u / 3u);
     QColor color(red8, green8, blue4, 0xFF);
     return color;
 }
 
-inline quint8 colorTo844(QColor color){
+inline quint8 colorTo844(const QColor &color) {
     return quint8((color.red() * 7 / 255) << 5 | (color.green() * 7 / 255) << 2 | (color.blue() * 3 / 255));
 }
 
-QPixmap pixmapFromColor(QColor color)
-{
+QPixmap pixmapFromColor(const QColor &color) {
     QPixmap pixmap(32, 32);
     pixmap.fill(color);
     return pixmap;
@@ -27,26 +23,24 @@ QPixmap pixmapFromColor(QColor color)
 
 
 QVPShapeActions::QVPShapeActions(QWidget *parent, QVP::shapeType type, QColor color, int width,
-                QPointF firstCoord):
-    QMainWindow(parent),
-    m_shapeType(type),
-    m_color(color),
-    m_newColor(color),
-    m_colorButton( new QVPColorButton(colorTo844(color)))
-
-{
+                                 QPointF firstCoord) :
+        QMainWindow(parent),
+        m_shapeType(type),
+        m_color(color),
+        m_newColor(color),
+        m_colorButton(new QVPColorButton(colorTo844(color))) {
     init(width, firstCoord);
     m_firstCoordYLbl->setText("Point: Y");
     m_firstCoordXLbl->setText("Point: X");
 }
+
 QVPShapeActions::QVPShapeActions(QWidget *parent, QVP::shapeType type, QColor color, int width,
-                QPointF firstCoord, QPointF lastCoord):
-    QMainWindow(parent),
-    m_shapeType(type),
-    m_color(color),
-    m_newColor(color),
-    m_colorButton( new QVPColorButton(colorTo844(color)))
-{
+                                 QPointF firstCoord, QPointF lastCoord) :
+        QMainWindow(parent),
+        m_shapeType(type),
+        m_color(color),
+        m_newColor(color),
+        m_colorButton(new QVPColorButton(colorTo844(color))) {
     init(width, firstCoord);
 
     m_firstCoordXLbl->setText("First point: X");
@@ -72,14 +66,14 @@ QVPShapeActions::QVPShapeActions(QWidget *parent, QVP::shapeType type, QColor co
     m_gridLayout->addWidget(m_lastCoordYSb, 2, 4);
 
 }
+
 QVPShapeActions::QVPShapeActions(QWidget *parent, QVP::shapeType type, QColor color, int width,
-                QPointF center, qreal paramA, qreal paramB):
-    QMainWindow(parent),
-    m_shapeType(type),
-    m_color(color),
-    m_newColor(color),
-    m_colorButton( new QVPColorButton(colorTo844(color)))
-{
+                                 QPointF center, qreal paramA, qreal paramB) :
+        QMainWindow(parent),
+        m_shapeType(type),
+        m_color(color),
+        m_newColor(color),
+        m_colorButton(new QVPColorButton(colorTo844(color))) {
     init(width, center);
 
     m_firstCoordXLbl->setText("Center: X");
@@ -106,13 +100,12 @@ QVPShapeActions::QVPShapeActions(QWidget *parent, QVP::shapeType type, QColor co
 
 
 QVPShapeActions::QVPShapeActions(QWidget *parent, QVP::shapeType type, QColor color, int width,
-                QPointF center, qreal paramA, qreal paramB, qreal ang1, qreal ang2):
-    QMainWindow(parent),
-    m_shapeType(type),
-    m_color(color),
-    m_newColor(color),
-    m_colorButton( new QVPColorButton(colorTo844(color)))
-{
+                                 QPointF center, qreal paramA, qreal paramB, qreal ang1, qreal ang2) :
+        QMainWindow(parent),
+        m_shapeType(type),
+        m_color(color),
+        m_newColor(color),
+        m_colorButton(new QVPColorButton(colorTo844(color))) {
     init(width, center);
 
     m_firstCoordXLbl->setText("Center: X");
@@ -155,8 +148,7 @@ QVPShapeActions::QVPShapeActions(QWidget *parent, QVP::shapeType type, QColor co
     m_gridLayout->addWidget(m_paramAng2Sb, 3, 4);
 }
 
-void QVPShapeActions::init(int width, QPointF firstCoord)
-{
+void QVPShapeActions::init(int width, QPointF firstCoord) {
     m_cancelButton->setText("&Cancel");
     m_confirmButton->setText("&Confirm");
     m_gridLayout->addWidget(m_confirmButton, 100, 3);
@@ -169,21 +161,17 @@ void QVPShapeActions::init(int width, QPointF firstCoord)
     connect(m_colorButton, &QPushButton::clicked, this, &QVPShapeActions::showColorGrid);
     connect(m_colorSelectionWidget, &QVPColorGridWidget::closed, this, &QVPShapeActions::hideColorGrid);
 
-    QGridLayout* grid = new QGridLayout(m_colorSelectionWidget);
+    auto grid = new QGridLayout(m_colorSelectionWidget);
     for (quint8 i = 0; i < 4; i++) {
         for (quint8 j = 0; j < 8; j++) {
             for (quint8 k = 0; k < 8; k++) {
 
                 auto clr844 = quint8((k << 5) | (j << 2) | i);
-                QVPColorButton* btn = new QVPColorButton(quint8((k << 5) | (j << 2) | i));
+                auto btn = new QVPColorButton(quint8((k << 5) | (j << 2) | i));
                 btn->setCheckable(true);
-                if (colorTo844(m_color) == clr844){
-                    btn->setChecked(true);
-                } else {
-                    btn->setChecked(false);
-                }
-                int y = (j*(1 - 2*(i >> 1))%8 + 16 *  (i >> 1));
-                int x = (k*(1 - 2*(i &  1))%8 + 16 * (i & 1));
+                btn->setChecked(colorTo844(m_color) == clr844);
+                int y = (j * (1 - 2 * (i >> 1)) % 8 + 16 * (i >> 1));
+                int x = (k * (1 - 2 * (i & 1)) % 8 + 16 * (i & 1));
                 grid->addWidget(btn, x, y);
                 m_colorGridButtons << btn;
                 connect(btn, &QVPColorButton::changeColor, this, &QVPShapeActions::setColor);
@@ -233,32 +221,25 @@ void QVPShapeActions::init(int width, QPointF firstCoord)
 
 }
 
-void QVPShapeActions::showColorGrid()
-{
+void QVPShapeActions::showColorGrid() {
     m_colorConsistency = false;
     m_colorSelectionWidget->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     m_colorSelectionWidget->show();
 }
 
-void QVPShapeActions::hideColorGrid()
-{
+void QVPShapeActions::hideColorGrid() {
     qDebug() << "hiding collor grid";
     m_colorConsistency = true;
     m_colorSelectionWidget->hide();
     m_newColor = m_color;
     quint8 color = colorTo844(m_color);
 
-    for (auto btn : m_colorGridButtons){
-        if (btn->getColor() != color){
-            btn->setChecked(false);
-        } else {
-            btn->setChecked(true);
-        }
+    for (auto btn : m_colorGridButtons) {
+        btn->setChecked(btn->getColor() == color);
     }
 }
 
-void QVPShapeActions::saveColorGrid()
-{
+void QVPShapeActions::saveColorGrid() {
     qDebug() << "saving collor grid";
     m_color = m_newColor;
     m_colorConsistency = true;
@@ -266,29 +247,26 @@ void QVPShapeActions::saveColorGrid()
     m_colorButton->setIcon(pixmapFromColor(m_color));
 }
 
-void QVPShapeActions::setColor(quint8 color)
-{
+void QVPShapeActions::setColor(quint8 color) {
     m_newColor = colorFrom884(color);
-    for (auto btn : m_colorGridButtons){
-        if (btn->getColor() != color){
+    for (auto btn : m_colorGridButtons) {
+        if (btn->getColor() != color) {
             btn->setChecked(false);
         }
     }
 }
 
-QVPColorButton::QVPColorButton(quint8 color) : m_color(color)
-{
+QVPColorButton::QVPColorButton(quint8 color) : m_color(color) {
     setFlat(true);
     setIcon(QIcon(pixmapFromColor(colorFrom884(m_color))));
     connect(this, &QPushButton::toggled, this, &QVPColorButton::checkButton);
 }
 
-void QVPShapeActions::save()
-{
+void QVPShapeActions::save() {
     QPointF first(m_firstCoordXSb->value(), m_firstCoordYSb->value());
     QPointF last;
-    if(m_lastCoordYSb && m_lastCoordXSb){
-        last = QPointF(double(m_lastCoordXSb->value()), double(m_lastCoordYSb->value()));
+    if (m_lastCoordYSb && m_lastCoordXSb) {
+        last = QPointF(m_lastCoordXSb->value(), m_lastCoordYSb->value());
     }
     hide();
     emit updateShape(m_color, m_widthSb->value(), first, last,
@@ -298,8 +276,7 @@ void QVPShapeActions::save()
                      m_paramAng2Sb ? m_paramAng2Sb->value() : 1.0);
 }
 
-void QVPShapeActions::cancel()
-{
+void QVPShapeActions::cancel() {
     hide();
     emit finished();
 }

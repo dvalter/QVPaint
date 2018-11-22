@@ -1,8 +1,6 @@
 #include "qvpmainwindow.h"
-#include <QApplication>
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     try { /* just to catch any exception in code below */
 
         QApplication::setDesktopSettingsAware(true);
@@ -12,7 +10,7 @@ int main(int argc, char *argv[])
 
         return a.exec();
 
-    } catch (std::exception& e){
+    } catch (std::exception &e) {
         qWarning() << e.what();
         return 123;
     }

@@ -4,22 +4,24 @@
 #include <QAction>
 #include "config.h"
 
-class QVPAction : public QAction
-{
-    Q_OBJECT
+class QVPAction : public QAction {
+Q_OBJECT
 public:
-    QVPAction(const QIcon &icon, const QString &label, const QVP::editorMode mode, QObject *parent=nullptr);
+    QVPAction(const QIcon &icon, const QString &label, QVP::editorMode mode, QObject *parent = nullptr);
 
 public slots:
+
     void enable(bool state);
 
 signals:
+
     void toggled(QVP::editorMode mode);
 
 private:
     QVP::editorMode m_mode;
 
 private slots:
+
     void slotToggled(bool state);
 };
 

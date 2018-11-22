@@ -3,8 +3,7 @@
 
 #include <QColor>
 
-namespace QVP
-{
+namespace QVP {
     // 150ppi A4 magic numbers
     const int imageHeight = 1754;
     const int imageWigth = 2480;
