@@ -11,13 +11,11 @@ QColor colorFrom884(quint8 eightBit)
     quint8 blue4 = eightBit & 3;
     blue4 = blue4 * 255 / 3;
     QColor color(red8, green8, blue4, 0xFF);
-//    qDebug() << QString("%1").arg(eightBit, 8, 2) <<   " red=" << red8 << " green=" <<
-//                green8 << " blue=" << blue4 << " " << color;
     return color;
 }
 
 inline quint8 colorTo844(QColor color){
-    return (color.red() * 7 / 255) << 5 | (color.green() * 7 / 255) << 2 | (color.blue() * 3 / 255);
+    return quint8((color.red() * 7 / 255) << 5 | (color.green() * 7 / 255) << 2 | (color.blue() * 3 / 255));
 }
 
 QPixmap pixmapFromColor(QColor color)
@@ -75,7 +73,7 @@ QVPShapeActions::QVPShapeActions(QWidget *parent, QVP::shapeType type, QColor co
 
 }
 QVPShapeActions::QVPShapeActions(QWidget *parent, QVP::shapeType type, QColor color, int width,
-                QPointF center, float paramA, float paramB):
+                QPointF center, qreal paramA, qreal paramB):
     QMainWindow(parent),
     m_shapeType(type),
     m_color(color),
@@ -108,7 +106,7 @@ QVPShapeActions::QVPShapeActions(QWidget *parent, QVP::shapeType type, QColor co
 
 
 QVPShapeActions::QVPShapeActions(QWidget *parent, QVP::shapeType type, QColor color, int width,
-                QPointF center, float paramA, float paramB, float ang1, float ang2):
+                QPointF center, qreal paramA, qreal paramB, qreal ang1, qreal ang2):
     QMainWindow(parent),
     m_shapeType(type),
     m_color(color),
@@ -176,8 +174,8 @@ void QVPShapeActions::init(int width, QPointF firstCoord)
         for (quint8 j = 0; j < 8; j++) {
             for (quint8 k = 0; k < 8; k++) {
 
-                quint8 clr844 = (k << 5) | (j << 2) | i;
-                QVPColorButton* btn = new QVPColorButton((k << 5) | (j << 2) | i);
+                auto clr844 = quint8((k << 5) | (j << 2) | i);
+                QVPColorButton* btn = new QVPColorButton(quint8((k << 5) | (j << 2) | i));
                 btn->setCheckable(true);
                 if (colorTo844(m_color) == clr844){
                     btn->setChecked(true);
@@ -290,7 +288,7 @@ void QVPShapeActions::save()
     QPointF first(m_firstCoordXSb->value(), m_firstCoordYSb->value());
     QPointF last;
     if(m_lastCoordYSb && m_lastCoordXSb){
-        last = QPointF(float(m_lastCoordXSb->value()), float(m_lastCoordYSb->value()));
+        last = QPointF(double(m_lastCoordXSb->value()), double(m_lastCoordYSb->value()));
     }
     hide();
     emit updateShape(m_color, m_widthSb->value(), first, last,

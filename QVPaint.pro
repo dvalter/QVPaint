@@ -14,8 +14,18 @@ TEMPLATE = app
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
-CONFIG += c++14
-QMAKE_CXXFLAGS += -std=gnu++14
+CONFIG += c++17
+QMAKE_CXXFLAGS += -std=c++17
+QMAKE_CXXFLAGS += -Wall
+QMAKE_CXXFLAGS += -Wextra
+QMAKE_CXXFLAGS_DEBUG += -fprofile-arcs
+QMAKE_CXXFLAGS_DEBUG += -ftest-coverage
+QMAKE_CXXFLAGS_DEBUG += -lgcov
+#QMAKE_CXXFLAGS_DEBUG += -fsanitize=address
+#QMAKE_CXXFLAGS_DEBUG += -fno-omit-frame-pointer
+#QMAKE_LFLAGS_DEBUG += -fsanitize=address
+QMAKE_LFLAGS_DEBUG += -ftest-coverage
+QMAKE_LFLAGS_DEBUG += -fprofile-arcs
 
 
 SOURCES += \

@@ -18,8 +18,6 @@ QVPDocument::QVPDocument(QWidget* parent) :
 
     setMouseTracking(true);
     emit shapeSelected(false);
-//    m_shapesList.append(new QVPEllipticArc(this, QVP::penColor, QPointF(100, 100), 50.0, 50.0, -M_PI_2, M_PI_2));
-//    update();
 }
 
 
@@ -184,10 +182,10 @@ void QVPDocument::mouseReleaseEvent(QMouseEvent *me)
         QVPLine* selectedLinePtr = qobject_cast<QVPLine *>(m_selectedShapesList.last());
         QPointF sa = selectedLinePtr->getFirst();
         QPointF sb = selectedLinePtr->getLast();
-        float x = sb.x() - sa.x();
-        float y = sb.y() - sa.y();
+        double x = sb.x() - sa.x();
+        double y = sb.y() - sa.y();
         double lenght = sqrt(x*x + y*y);
-        float scale = targetLenght/lenght;
+        double scale = targetLenght/lenght;
         b.setX(a.x() + y * scale);
         b.setY(a.y() - x * scale);
         m_shapesList.append(new QVPLine(this, QVP::penColor, a, b));
@@ -375,29 +373,29 @@ void QVPDocument::parseString(QString inStr)
 
     if (inList[0] == "D"){
         QColor color(colorFrom8BitStr(inList[3]));
-        QPointF point(inList[1].toFloat(), inList[2].toFloat());
+        QPointF point(inList[1].toDouble(), inList[2].toDouble());
         int width  = inList[4].toInt();
         m_shapesList.append(new QVPDot(this, color, point, width));
     } elif (inList[0] == "L"){
         QColor color(colorFrom8BitStr(inList[5]));
-        QPointF first(inList[1].toFloat(), inList[2].toFloat());
-        QPointF last(inList[3].toFloat(), inList[4].toFloat());
+        QPointF first(inList[1].toDouble(), inList[2].toDouble());
+        QPointF last(inList[3].toDouble(), inList[4].toDouble());
         int width  = inList[6].toInt();
         m_shapesList.append(new QVPLine(this, color, first, last, width));
     } elif (inList[0] == "E"){
         QColor color(colorFrom8BitStr(inList[5]));
-        QPointF center(inList[1].toFloat(), inList[2].toFloat());
-        float a = inList[3].toFloat();
-        float b = inList[4].toFloat();
+        QPointF center(inList[1].toDouble(), inList[2].toDouble());
+        qreal a = inList[3].toFloat();
+        qreal b = inList[4].toFloat();
         int width  = inList[6].toInt();
         m_shapesList.append(new QVPEllipse(this, color, center, a, b, width));
     } elif (inList[0] == "A"){
         QColor color(colorFrom8BitStr(inList[7]));
-        QPointF center(inList[1].toFloat(), inList[2].toFloat());
-        float a = inList[3].toFloat();
-        float b = inList[4].toFloat();
-        float ang1 = inList[5].toFloat();
-        float ang2 = inList[6].toFloat();
+        QPointF center(inList[1].toDouble(), inList[2].toDouble());
+        qreal a = inList[3].toFloat();
+        qreal b = inList[4].toFloat();
+        qreal ang1 = inList[5].toFloat();
+        qreal ang2 = inList[6].toFloat();
         int width  = inList[8].toInt();
         m_shapesList.append(new QVPEllipticArc(this, color, center, a, b, ang1, ang2, width));
     } else {
@@ -409,7 +407,7 @@ QColor colorFrom8BitStr(QString str)
 {
     qDebug() << str;
 
-    quint8  color = str.toInt(nullptr, 8);
+    auto color = quint8(str.toInt(nullptr, 8));
 
     quint8 red =    ((color & 224) >> 5) * 255 / 7;
     quint8 green =  ((color & 28) >> 2) * 255 / 7;
@@ -455,17 +453,22 @@ bool QVPDocument::saveToFile(const QString& fileName)
 
 void QVPDocument::acceptParamsClose()
 {
-    if(m_shapeActions) {
+    qDebug() << __FUNCTION__;
+    if(m_shapeActions != nullptr) {
+        qDebug() << "shapeActions deleteOnClose::" << m_shapeActions->testAttribute(Qt::WA_DeleteOnClose);
+        m_shapeActions->setAttribute(Qt::WA_DeleteOnClose);
         m_shapeActions->close();
-        m_shapeActions->deleteLater();
-        m_shapeActions = nullptr;
+        if(m_shapeActions != nullptr) {
+            m_shapeActions->deleteLater();
+            m_shapeActions = nullptr;
+        }
     }
 
     emit switchToSelection();
 }
 
 void QVPDocument::receiveParams(QColor color, int width, QPointF first, QPointF last,
-                                float a, float b, float ang1, float ang2)
+                                qreal a, qreal b, qreal ang1, qreal ang2)
 {
     QVPShape* shape = m_selectedShapesList.last();
     shape->setColor(color);
@@ -483,8 +486,8 @@ void QVPDocument::receiveParams(QColor color, int width, QPointF first, QPointF 
     } elif (qobject_cast<QVPEllipse *>(shape)){
         QVPEllipse* ellipse = qobject_cast<QVPEllipse *>(shape);
         ellipse->setCenter(first);
-        ellipse->setA(a);
-        ellipse->setB(b);
+        ellipse->setA(int(a));
+        ellipse->setB(int(b));
 
     } elif (qobject_cast<QVPEllipticArc *>(shape)){
         QVPEllipticArc* arc = qobject_cast<QVPEllipticArc *>(shape);

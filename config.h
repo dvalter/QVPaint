@@ -9,12 +9,8 @@ namespace QVP
     const int imageHeight = 1754;
     const int imageWigth = 2480;
 
-    // default window params
-    const int windowHeight = 400;
-    const int windowWidth = 600;
-
     // QVPaint modes
-    enum editorMode{
+    enum editorMode : quint8 {
         drawLine,
         drawDot,
         drawEllipse,
@@ -27,7 +23,7 @@ namespace QVP
         setUp
     };
 
-    enum shapeType{
+    enum shapeType : quint8 {
         point,
         line,
         ellipse,

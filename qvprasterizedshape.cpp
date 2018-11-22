@@ -1,4 +1,4 @@
-#include <qvprasterizedshape.h>
+#include "qvprasterizedshape.h"
 
 
 QVPRasterizedShape::QVPRasterizedShape():

@@ -11,9 +11,7 @@ QVPShape::QVPShape(QObject *parent, QColor penColor, int width) :
 QVPShape::~QVPShape()
 {
     delete m_shapePoints;
-    if (m_rasterized){
-        delete m_rasterized;
-    }
+    delete m_rasterized;
 }
 
 bool QVPShape::getSelected() const
@@ -70,15 +68,15 @@ int QVPShape::testPoint(QPoint point)
 QList<QVPShape *> QVPShape::cutRect(QPointF first, QPointF last)
 {
     QList<QVPShape *> result;
-    QList<QVPShape *> a = cutLine(first, QPoint(last.x(), first.y()));
+    QList<QVPShape *> a = cutLine(first, QPoint(int(last.x()), int(first.y())));
     for (auto shape : a){
-        QList<QVPShape *> b = shape->cutLine(QPoint(last.x(), first.y()) , last);
+        QList<QVPShape *> b = shape->cutLine(QPoint(int(last.x()), int(first.y())) , last);
         delete shape;
         for (auto shape : b){
-            QList<QVPShape *> c = shape->cutLine(last , QPoint(first.x(), last.y()));
+            QList<QVPShape *> c = shape->cutLine(last , QPoint(int(first.x()), int(last.y())));
             delete shape;
             for (auto shape : c){
-                QList<QVPShape *> d = shape->cutLine(QPoint(first.x(), last.y()) , first);
+                QList<QVPShape *> d = shape->cutLine(QPoint(int(first.x()), int(last.y())) , first);
                 result.append(d);
                 delete shape;
             }

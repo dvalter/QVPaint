@@ -1,6 +1,7 @@
 #ifndef QVPSHAPE_H
 #define QVPSHAPE_H
 
+
 #include <QObject>
 #include <QtWidgets>
 #include "config.h"
@@ -8,7 +9,9 @@
 
 class QVPShape : public QObject
 {
+
     Q_OBJECT
+
 public:
     explicit QVPShape(QObject *parent = nullptr, QColor penColor = QVP::penColor, int width=2);
     virtual void handleMousePressEvent(QMouseEvent * me) = 0;
@@ -30,7 +33,7 @@ public:
     void setColor(const QColor &penColor);
     void setWidth(int width);
 
-    virtual ~QVPShape();
+    virtual ~QVPShape() override;
 
 
 
@@ -53,7 +56,6 @@ protected:
 
     QVector<QPoint> * m_shapePoints = new QVector<QPoint>;
     QColor m_penColor;
-//    QImage* m_image;
     bool m_mousePressed = false;
     bool m_selected = false;
     QVPRasterizedShape* m_rasterized = new QVPRasterizedShape;

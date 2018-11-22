@@ -7,7 +7,7 @@
 static const double Epsilon = 2;
 
 
-inline float Q_rsqrt( float number );
+inline qreal Q_rsqrt( qreal number );
 
 QVPEllipse::QVPEllipse(QColor penColor):
     QVPShape(nullptr, penColor)
@@ -28,7 +28,7 @@ QVPEllipse::QVPEllipse(QObject * parent):
 }
 
 QVPEllipse::QVPEllipse(QObject *parent, QColor penColor, QPointF center,
-                               float a, float b, int width):
+                               qreal a, qreal b, int width):
     QVPShape(parent, penColor, width),
     m_center(center),
     m_a(a),
@@ -140,25 +140,23 @@ void QVPEllipse::handleMouseReleaseEvent(QMouseEvent * me)
 }
 
 inline void QVPEllipse::initEllipseParams(){
-    m_center = QPoint(abs(m_firstPoint.x() + m_lastPoint.x()) / 2, abs(m_firstPoint.y() + m_lastPoint.y()) / 2);
-    m_a = abs(m_firstPoint.x() - m_lastPoint.x()) / 2;
-    m_b = abs(m_firstPoint.y() - m_lastPoint.y()) / 2;
+    m_center = QPoint(int(abs(m_firstPoint.x() + m_lastPoint.x()) / 2), int(abs(m_firstPoint.y() + m_lastPoint.y()) / 2));
+    m_a = int(abs(m_firstPoint.x() - m_lastPoint.x()) / 2);
+    m_b = int(abs(m_firstPoint.y() - m_lastPoint.y()) / 2);
 }
 
-inline float QVPEllipse::sin(QPointF point)
+inline qreal QVPEllipse::sin(QPointF point)
 {
-    volatile float x = point.x() - m_center.x();
-    volatile float y = point.y() - m_center.y();
-//    return y*Q_rsqrt(x*x + y*y);
+    volatile qreal x = point.x() - m_center.x();
+    volatile qreal y = point.y() - m_center.y();
     return y / sqrt(x*x + y*y);
 }
 
 
-inline float QVPEllipse::cos(QPointF point)
+inline qreal QVPEllipse::cos(QPointF point)
 {
-    volatile float x = point.x() - m_center.x();
-    volatile float y = point.y() - m_center.y();
-//    return x*Q_rsqrt(x*x + y*y);
+    volatile qreal x = point.x() - m_center.x();
+    volatile qreal y = point.y() - m_center.y();
     return x / sqrt(x*x + y*y);
 }
 
@@ -198,9 +196,9 @@ void QVPEllipse::setCenter(const QPointF &center)
 
 
 
-inline float angleFromSC(float sin, float cos){
-    volatile float asin = asinf(sin);
-    volatile float acos = acosf(cos);
+inline qreal angleFromSC(qreal sin, qreal cos){
+    volatile qreal asin = asinf(sin);
+    volatile qreal acos = acosf(cos);
     if (acos < 0.7){
         return -asin;
     } elif (acos > 2.4){
@@ -231,21 +229,21 @@ void QVPEllipse::move(QPointF vec)
     update();
 }
 
-inline void swap(volatile float& a, volatile float& b){
-    volatile float tmp = a;
+inline void swap(volatile qreal& a, volatile qreal& b){
+    volatile qreal tmp = a;
     a = b;
     b = tmp;
 }
 
-inline void swap(float& a, float& b){
-    volatile float tmp = a;
+inline void swap(qreal& a, qreal& b){
+    volatile qreal tmp = a;
     a = b;
     b = tmp;
 }
 
-static bool ellipseIntersectLine(volatile float a, volatile float b, volatile float h, volatile float k,
-volatile float x1 , volatile float y1 , volatile float x2 , volatile float y2,
-float &xi1 , float &xi2 , float &yi1 , float &yi2)
+static bool ellipseIntersectLine(volatile qreal a, volatile qreal b, volatile qreal h, volatile qreal k,
+volatile qreal x1 , volatile qreal y1 , volatile qreal x2 , volatile qreal y2,
+qreal &xi1 , qreal &xi2 , qreal &yi1 , qreal &yi2)
 {
 
     bool inverted = false;
@@ -257,11 +255,11 @@ float &xi1 , float &xi2 , float &yi1 , float &yi2)
         inverted = true;
         qDebug() << "inverted";
     }
-    volatile float aa,bb,cc,m;
+    volatile qreal aa,bb,cc,m;
     //
     if ( x1 != x2) {
         m = (y2-y1)/(x2-x1);
-        float c = y1 - m*x1;
+        qreal c = y1 - m*x1;
         //
         aa = b*b + a*a*m*m;
         bb = 2*a*a*c*m - 2*a*a*k*m - 2*h*b*b;
@@ -275,7 +273,7 @@ float &xi1 , float &xi2 , float &yi1 , float &yi2)
         cc = -a*a*b*b + b*b*(x1-h)*(x1-h);
     }
 
-    float d = bb*bb-4*aa*cc;
+    qreal d = bb*bb-4*aa*cc;
     //
     // intersection points : (xi1,yi1) and (xi2,yi2)
     //
@@ -301,12 +299,12 @@ float &xi1 , float &xi2 , float &yi1 , float &yi2)
     return true;
 }
 
-inline float min(const float& a, const float& b)
+inline qreal min(const qreal& a, const qreal& b)
 {
     return a<b?a:b;
 }
 
-inline float max(const float& a, const float& b)
+inline qreal max(const qreal& a, const qreal& b)
 {
     return a>b?a:b;
 }
@@ -323,15 +321,15 @@ inline bool between(const QPointF& a, const QPointF& first, const QPointF& last)
 QList<QVPShape *> QVPEllipse::cutLine(QPointF first, QPointF last)
 {
 
-    float x1, x2, y1, y2;
+    qreal x1, x2, y1, y2;
     QList<QVPShape *> newShapes;
     if (ellipseIntersectLine(m_a, m_b, m_center.x(), m_center.y(), first.x(), first.y(),
                              last.x(), last.y(), x1, x2, y1, y2)){
         QPointF int1(x1, y1), int2(x2, y2);
         qDebug() << int1 << " " << between(int1, first, last) << " " << int2 << " " << between(int2, first, last)/* << int1==int2*/;
         if (between(int1, first, last) && between(int2, first, last)){
-            volatile float ang1 = angleFromSC(sin(int1), cos(int1));
-            volatile float ang2 = angleFromSC(sin(int2), cos(int2));
+            volatile qreal ang1 = angleFromSC(sin(int1), cos(int1));
+            volatile qreal ang2 = angleFromSC(sin(int2), cos(int2));
             newShapes.append(new QVPEllipticArc(parent(), m_penColor, m_center, m_a, m_b, ang1, ang2, m_width));
             newShapes.append(new QVPEllipticArc(parent(), m_penColor, m_center, m_a, m_b, ang2, ang1, m_width));
         }
@@ -342,18 +340,18 @@ QList<QVPShape *> QVPEllipse::cutLine(QPointF first, QPointF last)
 QList<QVPShape *> QVPEllipse::cutRect(QPointF first, QPointF last)
 {
     QList<QVPShape *> result;
-    QVector<float> angles;
+    QVector<qreal> angles;
 
-    float x1, x2, y1, y2;
+    qreal x1, x2, y1, y2;
     if (ellipseIntersectLine(m_a, m_b, m_center.x(), m_center.y(), first.x(), first.y(),
                              last.x(), first.y(), x1, x2, y1, y2)){
         QPointF int1(x1, y1), int2(x2, y2);
         if (between(int1, first, last)){
-           float ang  = angleFromSC(sin(int1), cos(int1));
+           qreal ang  = angleFromSC(sin(int1), cos(int1));
            angles.append(ang);
         }
         if (between(int2, first, last)){
-           float ang  = angleFromSC(sin(int2), cos(int2));
+           qreal ang  = angleFromSC(sin(int2), cos(int2));
            angles.append(ang);
         }
     }
@@ -361,11 +359,11 @@ QList<QVPShape *> QVPEllipse::cutRect(QPointF first, QPointF last)
                              last.x(), last.y(), x1, x2, y1, y2)){
         QPointF int1(x1, y1), int2(x2, y2);
         if (between(int1, first, last)){
-           float ang  = angleFromSC(sin(int1), cos(int1));
+           qreal ang  = angleFromSC(sin(int1), cos(int1));
            angles.append(ang);
         }
         if (between(int2, first, last)){
-           float ang  = angleFromSC(sin(int2), cos(int2));
+           qreal ang  = angleFromSC(sin(int2), cos(int2));
            angles.append(ang);
         }
     }
@@ -373,11 +371,11 @@ QList<QVPShape *> QVPEllipse::cutRect(QPointF first, QPointF last)
                              first.x(), last.y(), x1, x2, y1, y2)){
         QPointF int1(x1, y1), int2(x2, y2);
         if (between(int1, first, last)){
-           float ang  = angleFromSC(sin(int1), cos(int1));
+           qreal ang  = angleFromSC(sin(int1), cos(int1));
            angles.append(ang);
         }
         if (between(int2, first, last)){
-           float ang  = angleFromSC(sin(int2), cos(int2));
+           qreal ang  = angleFromSC(sin(int2), cos(int2));
            angles.append(ang);
         }
     }
@@ -385,11 +383,11 @@ QList<QVPShape *> QVPEllipse::cutRect(QPointF first, QPointF last)
                              first.x(), first.y(), x1, x2, y1, y2)){
         QPointF int1(x1, y1), int2(x2, y2);
         if (between(int1, first, last)){
-           float ang  = angleFromSC(sin(int1), cos(int1));
+           qreal ang  = angleFromSC(sin(int1), cos(int1));
            angles.append(ang);
         }
         if (between(int2, first, last)){
-           float ang  = angleFromSC(sin(int2), cos(int2));
+           qreal ang  = angleFromSC(sin(int2), cos(int2));
            angles.append(ang);
         }
     }

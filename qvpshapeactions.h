@@ -13,7 +13,7 @@ public:
     explicit QVPColorGridWidget(QWidget* parent = nullptr): QWidget(parent) {}
 
 protected:
-    void closeEvent(QCloseEvent *event) {
+    void closeEvent(QCloseEvent *event) override {
         emit closed();
         event->ignore();
     }
@@ -31,8 +31,7 @@ public:
     QVPColorButton(quint8 color);
     quint8 getColor() { return m_color; }
 
-    virtual ~QVPColorButton(){
-    }
+    virtual ~QVPColorButton() = default;
 
 signals:
     void changeColor(quint8 color);
@@ -59,9 +58,9 @@ public:
     QVPShapeActions(QWidget *parent, QVP::shapeType, QColor color, int width,
                     QPointF firstCoord, QPointF lastCoord);
     QVPShapeActions(QWidget *parent, QVP::shapeType, QColor color, int width,
-                    QPointF center, float paramA, float paramB);
+                    QPointF center, qreal paramA, qreal paramB);
     QVPShapeActions(QWidget *parent, QVP::shapeType, QColor color, int width,
-                    QPointF center, float paramA, float paramB, float ang1, float ang2);
+                    QPointF center, qreal paramA, qreal paramB, qreal ang1, qreal ang2);
 
 
 
@@ -73,7 +72,7 @@ public:
 signals:
     void finished();
     void updateShape(QColor color, int width, QPointF first, QPointF last,
-                     float a, float b, float ang1, float ang2);
+                     qreal a, qreal b, qreal ang1, qreal ang2);
 
 public slots:
     void showColorGrid();
@@ -123,7 +122,6 @@ private:
     QLabel* m_widthLbl  = new QLabel(this);
     QSpinBox* m_widthSb = new QSpinBox(this);
 
-//    QHBoxLayout m_colorBox;
     QLabel* m_colorLbl  = new QLabel(this);
     QColor m_color;
     QColor m_newColor;
@@ -138,8 +136,6 @@ private:
 
     QPushButton* m_colorConfirmButton = new QPushButton(this);
     QPushButton* m_colorCancelButton = new QPushButton(this);
-
-
 
 };
 

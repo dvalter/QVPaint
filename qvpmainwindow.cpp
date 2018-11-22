@@ -22,7 +22,6 @@ QVPMainWindow::QVPMainWindow(QWidget *parent)
       m_toolActionGroup(new QActionGroup(this))
 {
 
-    //QStringList toolbarElementsList({"selection", "dot", "line", "ellipse", "elliptic-curve", "cross"});
     initToolsList();
     initToolbar(m_leftToolBar, m_toolsList, (Qt::LeftToolBarArea));
 
@@ -61,6 +60,10 @@ void QVPMainWindow::coordUpdated(QPoint coord)
 
 QVPMainWindow::~QVPMainWindow()
 {
+    for (auto& act : m_toolActionGroup->actions()) {
+        m_toolActionGroup->removeAction(act);
+        delete act;
+    }
 
 }
 
@@ -86,7 +89,7 @@ void QVPMainWindow::initToolbar(QToolBar * toolBar, QList<QVPToolPair > elements
     fileMenu->addSeparator();
     fileMenu->addAction(tr("E&xit"),this, SLOT(close()), QKeySequence::Quit);
 
-    QMenu *const toolMenu = menuBar()->addMenu("&Tools");
+    m_toolMenu = menuBar()->addMenu("&Tools");
 
     int counter = 0;
     for (QVPToolPair mode : elements){
@@ -94,7 +97,7 @@ void QVPMainWindow::initToolbar(QToolBar * toolBar, QList<QVPToolPair > elements
         act->setCheckable(true);
         m_toolActionGroup->addAction(act);
 
-        toolMenu->addAction(act);
+        m_toolMenu->addAction(act);
 
 
         QObject::connect(act, &QVPAction::toggled, this, &QVPMainWindow::updateMode);
@@ -111,8 +114,6 @@ void QVPMainWindow::initToolbar(QToolBar * toolBar, QList<QVPToolPair > elements
         }
         counter++;
     }
-
-//    emit shapeSelected(false);
 
     m_toolActionGroup->setExclusive(true);
 
@@ -152,7 +153,7 @@ void QVPMainWindow::save()
     const QString fileName =
             QFileDialog::getSaveFileName(
                 this, "Save As", initialPath, "QVPI Files (*.qvpi);;All Files (*)");
-    //qCritical() << "SAVE FILE NOT IMPLEMENTED";
+
     if (!(!fileName.isEmpty() && m_mainDocument->saveToFile(fileName)))
         qCritical() << "FAILED TO SAVE";
 }

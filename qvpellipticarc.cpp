@@ -6,8 +6,8 @@
 
 static const double Epsilon = 2;
 
-inline float angleFromSC(float sin, float cos);
-inline float Q_rsqrt( float number );
+inline qreal angleFromSC(qreal sin, qreal cos);
+inline qreal Q_rsqrt( qreal number );
 
 QVPEllipticArc::QVPEllipticArc(QColor penColor):
     QVPShape(nullptr, penColor)
@@ -28,7 +28,7 @@ QVPEllipticArc::QVPEllipticArc(QObject * parent):
 }
 
 QVPEllipticArc::QVPEllipticArc(QObject *parent, QColor penColor, QPointF center,
-                               float a, float b, float a1, float a2, int width):
+                               qreal a, qreal b, qreal a1, qreal a2, int width):
     QVPShape(parent, penColor, width),
     m_center(center),
     m_a(a),
@@ -56,7 +56,7 @@ inline void QVPEllipticArc::appendPoint(QPoint point, QVector<QPoint>& vec)
     }
 
 
-    QPoint point;
+//  QPoint point;
     long b_square = b * b;
     long a_square = a * a;
     int row = b;
@@ -114,19 +114,19 @@ void QVPEllipticArc::update()
 
     m_shapePoints->clear();
     bresenham_elliptic_arc(*m_shapePoints,
-                m_center.x(), m_center.y(), m_a, m_b);
+                int(m_center.x()), int(m_center.y()), int(m_a), int(m_b));
 
     if (m_state == 2 || m_state == 3){
         bresenham_line(*m_shapePoints,
-                    m_center.x(), m_center.y(),
-                    m_firstPoint.x(), m_firstPoint.y());
+                    int(m_center.x()), int(m_center.y()),
+                    int(m_firstPoint.x()), int(m_firstPoint.y()));
     } elif (m_state == 4){
         bresenham_line(*m_shapePoints,
-                    m_center.x(), m_center.y(),
-                    m_firstPoint.x(), m_firstPoint.y());
+                    int(m_center.x()), int(m_center.y()),
+                    int(m_firstPoint.x()), int(m_firstPoint.y()));
         bresenham_line(*m_shapePoints,
-                    m_center.x(), m_center.y(),
-                    m_lastPoint.x(), m_lastPoint.y());
+                    int(m_center.x()), int(m_center.y()),
+                    int(m_lastPoint.x()), int(m_lastPoint.y()));
     }
 
     if (m_rasterized != nullptr){
@@ -191,67 +191,68 @@ void QVPEllipticArc::handleMouseReleaseEvent(QMouseEvent * me)
     update();
 }
 
-inline float QVPEllipticArc::sin(QPointF point)
+inline qreal QVPEllipticArc::sin(QPointF point)
 {
-    volatile float x = point.x() - m_center.x();
-    volatile float y = point.y() - m_center.y();
+    volatile qreal x = point.x() - m_center.x();
+    volatile qreal y = point.y() - m_center.y();
     return y / sqrt(x*x + y*y);
 }
 
 
-inline float QVPEllipticArc::cos(QPointF point)
+inline qreal QVPEllipticArc::cos(QPointF point)
 {
-    volatile float x = point.x() - m_center.x();
-    volatile float y = point.y() - m_center.y();
+    volatile qreal x = point.x() - m_center.x();
+    volatile qreal y = point.y() - m_center.y();
     return x / sqrt(x*x + y*y);
 }
 
 
 inline void QVPEllipticArc::initEllipseParams(){
-    m_center = QPoint(abs(m_firstPoint.x() + m_lastPoint.x()) / 2, abs(m_firstPoint.y() + m_lastPoint.y()) / 2);
-    m_a = abs(m_firstPoint.x() - m_lastPoint.x()) / 2;
-    m_b = abs(m_firstPoint.y() - m_lastPoint.y()) / 2;
+    m_center = QPoint(int(abs(m_firstPoint.x() + m_lastPoint.x()) / 2),
+                      int(abs(m_firstPoint.y() + m_lastPoint.y()) / 2));
+    m_a = int(abs(m_firstPoint.x() - m_lastPoint.x()) / 2);
+    m_b = int(abs(m_firstPoint.y() - m_lastPoint.y()) / 2);
 }
 
-float QVPEllipticArc::getAng2() const
+qreal QVPEllipticArc::getAng2() const
 {
     return m_ang2;
 }
 
-void QVPEllipticArc::setAng2(float ang2)
+void QVPEllipticArc::setAng2(qreal ang2)
 {
     m_ang2 = ang2;
     update();
 }
 
-float QVPEllipticArc::getAng1() const
+qreal QVPEllipticArc::getAng1() const
 {
     return m_ang1;
 }
 
-void QVPEllipticArc::setAng1(float ang1)
+void QVPEllipticArc::setAng1(qreal ang1)
 {
     m_ang1 = ang1;
     update();
 }
 
-float QVPEllipticArc::getB() const
+qreal QVPEllipticArc::getB() const
 {
     return m_b;
 }
 
-void QVPEllipticArc::setB(float b)
+void QVPEllipticArc::setB(qreal b)
 {
     m_b = b;
     update();
 }
 
-float QVPEllipticArc::getA() const
+qreal QVPEllipticArc::getA() const
 {
     return m_a;
 }
 
-void QVPEllipticArc::setA(float a)
+void QVPEllipticArc::setA(qreal a)
 {
     m_a = a;
     update();
@@ -268,9 +269,9 @@ void QVPEllipticArc::setCenter(const QPointF &center)
     update();
 }
 
-inline float angleFromSC(float sin, float cos){
-    float asin = asinf(sin);
-    float acos = acosf(cos);
+inline qreal angleFromSC(qreal sin, qreal cos){
+    qreal asin = asinh(sin);
+    qreal acos = acosh(cos);
     if (acos < 0.7){
         return -asin;
     } elif (acos > 2.4){
@@ -281,7 +282,7 @@ inline float angleFromSC(float sin, float cos){
 }
 
 inline bool QVPEllipticArc::checkPoint(QPointF point){
-    float angle = angleFromSC(sin(point), cos(point));
+    qreal angle = angleFromSC(sin(point), cos(point));
 
     if (m_ang1 < m_ang2){
         return angle > m_ang1 && angle < m_ang2;
@@ -311,21 +312,21 @@ void QVPEllipticArc::move(QPointF vec)
     update();
 }
 
-inline void swap(volatile float& a, volatile float& b){
-    volatile float tmp = a;
+inline void swap(volatile double& a, volatile double& b){
+    volatile double tmp = a;
     a = b;
     b = tmp;
 }
 
-inline void swap(float& a, float& b){
-    volatile float tmp = a;
+inline void swap(double& a, double& b){
+    volatile double tmp = a;
     a = b;
     b = tmp;
 }
 
-static bool ellipseIntersectLine(volatile float a, volatile float b, volatile float h, volatile float k,
-volatile float x1 , volatile float y1 , volatile float x2 , volatile float y2,
-float &xi1 , float &xi2 , float &yi1 , float &yi2)
+static bool ellipseIntersectLine(volatile double a, volatile double b, volatile double h, volatile double k,
+volatile double x1 , volatile double y1 , volatile double x2 , volatile double y2,
+double &xi1 , double &xi2 , double &yi1 , double &yi2)
 {
 
     bool inverted = false;
@@ -337,11 +338,11 @@ float &xi1 , float &xi2 , float &yi1 , float &yi2)
         inverted = true;
         qDebug() << "inverted";
     }
-    volatile float aa,bb,cc,m;
+    volatile double aa,bb,cc,m = 0.0;
     //
-    if ( x1 != x2) {
+    if (abs(x1 - x2) > Epsilon) { // !=
         m = (y2-y1)/(x2-x1);
-        float c = y1 - m*x1;
+        double c = y1 - m*x1;
         //
         aa = b*b + a*a*m*m;
         bb = 2*a*a*c*m - 2*a*a*k*m - 2*h*b*b;
@@ -355,12 +356,12 @@ float &xi1 , float &xi2 , float &yi1 , float &yi2)
         cc = -a*a*b*b + b*b*(x1-h)*(x1-h);
     }
 
-    float d = bb*bb-4*aa*cc;
+    double d = bb*bb-4*aa*cc;
     //
     // intersection points : (xi1,yi1) and (xi2,yi2)
     //
     if (d > 0.0) {
-        if (x1 != x2) {
+        if (abs(x1 - x2) > Epsilon) { // !=
             xi1 = (-bb + sqrt(d)) / (2*aa);
             xi2 = (-bb - sqrt(d)) / (2*aa);
             yi1 = y1 + m * (xi1 - x1);
@@ -381,12 +382,12 @@ float &xi1 , float &xi2 , float &yi1 , float &yi2)
     return true;
 }
 
-inline float min(const float& a, const float& b)
+inline qreal min(const qreal& a, const qreal& b)
 {
     return a<b?a:b;
 }
 
-inline float max(const float& a, const float& b)
+inline qreal max(const qreal& a, const qreal& b)
 {
     return a>b?a:b;
 }
@@ -404,15 +405,15 @@ inline bool between(const QPointF& a, const QPointF& first, const QPointF& last)
 QList<QVPShape *> QVPEllipticArc::cutLine(QPointF first, QPointF last)
 {
 
-    float x1, x2, y1, y2;
+    double x1, x2, y1, y2;
     QList<QVPShape *> newShapes;
-    if (ellipseIntersectLine(m_a, m_b, m_center.x(), m_center.y(), first.x(), first.y(),
+    if (ellipseIntersectLine(double(m_a), double(m_b), m_center.x(), m_center.y(), first.x(), first.y(),
                              last.x(), last.y(), x1, x2, y1, y2)){
         QPointF int1(x1, y1), int2(x2, y2);
-        QList<float> angles;
+        QList<qreal> angles;
 
-        float ang1 = angleFromSC(sin(int1), cos(int1));
-        float ang2 = angleFromSC(sin(int2), cos(int2));
+        qreal ang1 = angleFromSC(sin(int1), cos(int1));
+        qreal ang2 = angleFromSC(sin(int2), cos(int2));
 
         if (between(int1, first, last) && checkPoint(int1)){
 
@@ -422,7 +423,7 @@ QList<QVPShape *> QVPEllipticArc::cutLine(QPointF first, QPointF last)
 
         if (between(int2, first, last) && checkPoint(int2)){
 
-            if (angles.empty() || ang2 > ang1 || ((ang1 - ang2) > 2*M_PI)){
+            if (angles.empty() || ang2 > ang1 || (double(ang1 - ang2) > 2*M_PI)){
                 angles.append(ang2);
             } else {
                 angles.prepend(ang2);

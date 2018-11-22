@@ -26,16 +26,6 @@ public:
     void setFirst(const QPointF &firstPoint);
     void setLast(const QPointF &lastPoint);
 
-
-
-
-
-
-
-
-
-
-
 protected:
     virtual void update() override;
 
@@ -46,7 +36,7 @@ private:
     bool m_rectangle = false;
 
 };
-//QVector<QPoint> bresenham_line(int x1, int y1, int x2, int y2);
+
 void bresenham_line(QVector<QPoint>& line, int x1, int y1, int x2, int y2);
 
 #endif // QVPLINE_H

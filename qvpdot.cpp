@@ -45,10 +45,8 @@ void QVPDot::update()
     }
 
 
-    if (m_rasterized){
-        delete m_rasterized;
-    }
-    (*m_shapePoints)[0] = QPoint(m_firstPoint.x(), m_firstPoint.y());
+    delete m_rasterized;
+    (*m_shapePoints)[0] = QPoint(int(m_firstPoint.x()), int(m_firstPoint.y()));
     m_rasterized = new QVPRasterizedShape(m_shapePoints, color, m_width);
 }
 
@@ -68,7 +66,7 @@ void QVPDot::setCenter(const QPointF &firstPoint)
 void QVPDot::handleMousePressEvent(QMouseEvent * me)
 {
     m_firstPoint = me->pos();
-    if (m_shapePoints->size() == 0){
+    if (m_shapePoints->empty()){
         m_shapePoints->push_back(me->pos());
     }
     m_mousePressed = true;

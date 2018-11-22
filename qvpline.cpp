@@ -1,5 +1,5 @@
 #include "qvpline.h"
-#include <string.h>
+#include <cstring>
 #include <sstream>
 #include <cmath>
 
@@ -20,7 +20,7 @@ public:
 
     // Constructors.
     Vector(double x, double y) : X(x), Y(y) {}
-    Vector() : X(NAN), Y(NAN) {}
+    Vector() : X(double(NAN)), Y(double(NAN)) {}
     Vector(QPointF point) : X(point.x()), Y(point.y()) {}
 
     QPointF toQPointF(){
@@ -194,26 +194,24 @@ void QVPLine::update()
     m_shapePoints->clear();
     if (!m_rectangle){
         bresenham_line(*m_shapePoints,
-                m_firstPoint.x(), m_firstPoint.y(),
-                m_lastPoint.x(), m_lastPoint.y());
+                int(m_firstPoint.x()), int(m_firstPoint.y()),
+                int(m_lastPoint.x()), int(m_lastPoint.y()));
     } else {
         bresenham_line(*m_shapePoints,
-                m_firstPoint.x(), m_firstPoint.y(),
-                m_lastPoint.x(), m_firstPoint.y());
+                int(m_firstPoint.x()), int(m_firstPoint.y()),
+                int(m_lastPoint.x()), int(m_firstPoint.y()));
         bresenham_line(*m_shapePoints,
-                m_lastPoint.x(), m_firstPoint.y(),
-                m_lastPoint.x(), m_lastPoint.y());
+                int(m_lastPoint.x()), int(m_firstPoint.y()),
+                int(m_lastPoint.x()), int(m_lastPoint.y()));
         bresenham_line(*m_shapePoints,
-                m_lastPoint.x(), m_lastPoint.y(),
-                m_firstPoint.x(), m_lastPoint.y());
+                int(m_lastPoint.x()), int(m_lastPoint.y()),
+                int(m_firstPoint.x()), int(m_lastPoint.y()));
         bresenham_line(*m_shapePoints,
-                m_firstPoint.x(), m_lastPoint.y(),
-                m_firstPoint.x(), m_firstPoint.y());
+                int(m_firstPoint.x()), int(m_lastPoint.y()),
+                int(m_firstPoint.x()), int(m_firstPoint.y()));
     }
 
-    if (m_rasterized){
-        delete m_rasterized;
-    }
+    delete m_rasterized;
     m_rasterized = new QVPRasterizedShape(m_shapePoints, color, m_width);
 }
 

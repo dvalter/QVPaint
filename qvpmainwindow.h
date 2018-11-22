@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include <QtWidgets>
-//#include <boost/bimap.hpp>
 #include "qvpdocument.h"
 #include "config.h"
 
@@ -14,8 +13,8 @@ class QVPMainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    QVPMainWindow(QWidget *parent = 0);
-    ~QVPMainWindow();
+    QVPMainWindow(QWidget *parent = nullptr);
+    ~QVPMainWindow() override;
 
 
 public slots:
@@ -32,7 +31,6 @@ public slots:
 private:
     QScrollArea* m_scrollArea;
     QToolBar* m_leftToolBar;
-    //QLabel* m_imgLbl;
     QVPDocument* m_mainDocument;
     QLabel* m_coordXlbl;
     QLabel* m_coordYlbl;
@@ -41,6 +39,7 @@ private:
     QList<QVPToolPair> m_toolsList;
     QActionGroup* m_toolActionGroup;
     QAction* m_selectAction = nullptr;
+    QMenu * m_toolMenu = nullptr;
 
 protected:
     virtual void keyPressEvent(QKeyEvent* ke) override;

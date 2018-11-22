@@ -22,6 +22,5 @@ private:
     friend class QVPShape;
 };
 
-#include <qvpshape.h>
 
 #endif // QVPRASTERIZEDSHAPE_H

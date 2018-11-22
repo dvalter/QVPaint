@@ -2,7 +2,7 @@
 #define QVPDOCUMENT_H
 
 #include <QtWidgets>
-#include <qvpshape.h>
+#include "qvpshape.h"
 #include "config.h"
 #include "qvpdot.h"
 #include "qvpline.h"
@@ -19,7 +19,7 @@ public:
     bool saveToFile(const QString& fileName);
     bool loadFromFile(const QString& fileName);
 
-    ~QVPDocument(){
+    ~QVPDocument() override {
         for (auto shape : m_shapesList){
             delete shape;
         }
@@ -27,15 +27,12 @@ public:
             delete m_tmpShape;
         }
         delete m_mainImage;
-//        if (m_shapeActions != nullptr){
-//            delete m_shapeActions;
-//        }
     }
 
 public slots:
     void setEditorMode(QVP::editorMode em);
     void receiveParams(QColor color, int width, QPointF first, QPointF last,
-                     float a, float b, float ang1, float ang2);
+                     qreal a, qreal b, qreal ang1, qreal ang2);
     void acceptParamsClose();
 
 private:
@@ -43,10 +40,8 @@ private:
     QList<QVPShape*> m_selectedShapesList;
     QVPShape* m_tmpShape = nullptr;
     QImage* m_mainImage;
-//    QLabel* m_imgLbl;
-    qint8 m_counter = 0;
-    QVP::editorMode m_currentMode = QVP::drawLine;
     QVPShapeActions* m_shapeActions = nullptr;
+    QVP::editorMode m_currentMode = QVP::drawLine;
 
     bool previousWasFail = false;
 
@@ -54,7 +49,6 @@ private:
     void parseString(QString inStr);
     void updateImage();
     void searchPixel(QPoint);
-//    int checkPixel(QPoint);
 
 
 protected:

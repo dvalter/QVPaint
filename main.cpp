@@ -12,7 +12,8 @@ int main(int argc, char *argv[])
 
         return a.exec();
 
-    } catch (std::exception e){
+    } catch (std::exception& e){
+        qWarning() << e.what();
         return 123;
     }
 }

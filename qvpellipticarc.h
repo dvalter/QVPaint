@@ -14,12 +14,12 @@ public:
     explicit QVPEllipticArc(QObject *parent = nullptr);
     QVPEllipticArc(QObject *parent, QColor penColor);
     QVPEllipticArc(QColor penColor);
-    QVPEllipticArc(QObject *parent, QColor penColor, QPointF center, float a, float b, float a1, float a2, int width = 2);
+    QVPEllipticArc(QObject *parent, QColor penColor, QPointF center, qreal a, qreal b, qreal a1, qreal a2, int width = 2);
     virtual void handleMouseMoveEvent(QMouseEvent * me) override;
     virtual void handleMousePressEvent(QMouseEvent * me) override;
     virtual void handleMouseReleaseEvent(QMouseEvent * me) override;
     virtual bool isReady() override { return m_state > 4; }
-    virtual QVPRasterizedShape& getRasterized() { return *m_rasterized; }
+    virtual QVPRasterizedShape& getRasterized() override { return *m_rasterized; }
     virtual QString toString() override;
     virtual void move(QPointF vec) override;
     virtual QList<QVPShape *> cutLine(QPointF first, QPointF last) override;
@@ -29,17 +29,17 @@ public:
     QPointF getCenter() const;
     void setCenter(const QPointF &center);
 
-    float getA() const;
-    void setA(float a);
+    qreal getA() const;
+    void setA(qreal a);
 
-    float getB() const;
-    void setB(float b);
+    qreal getB() const;
+    void setB(qreal b);
 
-    float getAng1() const;
-    void setAng1(float ang1);
+    qreal getAng1() const;
+    void setAng1(qreal ang1);
 
-    float getAng2() const;
-    void setAng2(float ang2);
+    qreal getAng2() const;
+    void setAng2(qreal ang2);
 
 protected:
     virtual void update() override;
@@ -47,19 +47,19 @@ protected:
 private:
     inline bool checkPoint(QPointF point);
 
-    inline float sin(QPointF point);
-    inline float cos(QPointF point);
+    inline qreal sin(QPointF point);
+    inline qreal cos(QPointF point);
     inline void appendPoint(QPoint point, QVector<QPoint>& vec);
     void bresenham_elliptic_arc(QVector<QPoint> &ellipse, int x, int y, int a, int b);
     inline void initEllipseParams();
 
     QPointF m_center;
-    float m_a;
-    float m_b;
+    qreal m_a;
+    qreal m_b;
     QPointF m_firstPoint;
     QPointF m_lastPoint;
-    float m_ang1;
-    float m_ang2;
+    qreal m_ang1 = 0.0;
+    qreal m_ang2 = 2*M_PI;
     int m_state = 0;
 };
 

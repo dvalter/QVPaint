@@ -18,9 +18,8 @@ public:
     virtual QVPRasterizedShape& getRasterized() override;
     virtual QString toString() override;
     virtual void move(QPointF vec) override;
-    virtual QList<QVPShape *> cutLine(QPointF first, QPointF last) override;// { return QList<QVPShape *>();}
+    virtual QList<QVPShape *> cutLine(QPointF first, QPointF last) override;
     QPointF getCenter() { return m_firstPoint; }
-//    virtual QList<QVPShape *> cutRect(QPointF first, QPointF last) override;// { return QList<QVPShape *>();}
 
     QPointF getCenter() const;
     void setCenter(const QPointF &firstPoint);

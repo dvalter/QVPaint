@@ -11,11 +11,11 @@ public:
     explicit QVPEllipse(QObject *parent = nullptr);
     QVPEllipse(QObject *parent, QColor penColor);
     QVPEllipse(QColor penColor);
-    QVPEllipse(QObject *parent, QColor penColor, QPointF center, float a, float b, int width=2);
+    QVPEllipse(QObject *parent, QColor penColor, QPointF center, qreal a, qreal b, int width=2);
     virtual void handleMouseMoveEvent(QMouseEvent * me) override;
     virtual void handleMousePressEvent(QMouseEvent * me) override;
     virtual void handleMouseReleaseEvent(QMouseEvent * me) override;
-    virtual QVPRasterizedShape& getRasterized() { return *m_rasterized; }
+    virtual QVPRasterizedShape& getRasterized() override { return *m_rasterized; }
     virtual QString toString() override;
     virtual void move(QPointF vec) override;
     virtual QList<QVPShape *> cutLine(QPointF first, QPointF last) override;
@@ -36,10 +36,9 @@ protected:
 
 private:
     inline void initEllipseParams();
-    inline bool checkPoint(QPoint point);
 
-    inline float sin(QPointF point);
-    inline float cos(QPointF point);
+    inline qreal sin(QPointF point);
+    inline qreal cos(QPointF point);
 
     QPointF m_center;
     int m_a;
@@ -47,7 +46,6 @@ private:
     QPointF m_firstPoint;
     QPointF m_lastPoint;
 
-    //QLabel* testWGT;
 };
 
 void bresenham_ellipse(QVector<QPoint> &ellipse, int x, int y, int a, int b);
