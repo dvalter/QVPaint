@@ -55,11 +55,17 @@ set(HEADERS
     qvpshapeactions.h
 )
 
-set(RESOURCES
-    resource.qrc
-)
+# uncomment for properly licensed icons
+#set(RESOURCES
+#    resource.qrc
+#)
+#
+#qt5_add_resources(RSC ${RESOURCES})
 
-qt5_add_resources(RSC ${RESOURCES})
 
 add_executable(QVPaint ${HEADERS} ${SOURCES} ${RSC})
 target_link_libraries(QVPaint Qt5::Core Qt5::Gui Qt5::Widgets)
+
+add_custom_command(TARGET QVPaint PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/imgs $<TARGET_FILE_DIR:QVPaint>/imgs)

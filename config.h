@@ -10,15 +10,15 @@ namespace QVP {
 
     // QVPaint modes
     enum editorMode : quint8 {
-        drawLine,
+        selectShape,
         drawDot,
+        drawLine,
         drawEllipse,
         drawEllipticCurve,
-        selectShape,
         move,
+        makeOrtho,
         crossLine,
         clipRectangle,
-        makeOrtho,
         setUp
     };
 

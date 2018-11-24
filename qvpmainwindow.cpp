@@ -1,6 +1,29 @@
 #include "qvpmainwindow.h"
 #include "qvpaction.h"
 
+namespace QVP {
+    static const char *xdgIcons[] = {[selectShape] =       "edit-select",
+            [drawDot] =           "edit-map",
+            [drawLine] =          "draw-line",
+            [drawEllipse] =       "draw-ellipse",
+            [drawEllipticCurve] = "tool_curve",
+            [move] =              "transform-move",
+            [makeOrtho] =         "snap-orthogonal",
+            [crossLine] =         "edit-cut",
+            [clipRectangle] =     "select-rectangular",
+            [setUp] =             "preferences-activities"};
+
+    static const char *customIcons[] = {[selectShape] =       "cursor-arrow",
+            [drawDot] =           "edit-map",
+            [drawLine] =          "draw-line",
+            [drawEllipse] =       "draw-ellipse",
+            [drawEllipticCurve] = "draw-arc",
+            [move] =              "move",
+            [makeOrtho] =         "orthogonal",
+            [crossLine] =         "cut-line",
+            [clipRectangle] =     "cut-rectangular",
+            [setUp] =             "shape-params"};
+}
 
 QVPMainWindow::QVPMainWindow(QWidget *parent)
         : QMainWindow(parent),
@@ -80,7 +103,11 @@ void QVPMainWindow::initToolbar(QToolBar *toolBar, QList<QVPToolPair> elements, 
 
     int counter = 0;
     for (QVPToolPair mode : elements) {
-        QVPAction *act = new QVPAction(QPixmap(":/" + mode.second + ".svg"), mode.second, mode.first);
+
+        auto fallback = QPixmap(QCoreApplication::applicationDirPath() + "/imgs/" +
+                                QVP::customIcons[mode.first] + ".svg");
+        auto *act = new QVPAction(QIcon::fromTheme(QVP::xdgIcons[mode.first], fallback), mode.second, mode.first);
+
         act->setCheckable(true);
         m_toolActionGroup->addAction(act);
 

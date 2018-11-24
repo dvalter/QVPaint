@@ -309,7 +309,7 @@ void QVPDocument::setEditorMode(QVP::editorMode em) {
                 m_shapeActions->show();
             } elif (qobject_cast<QVPEllipticArc *>(shape)) {
                 auto *arc = qobject_cast<QVPEllipticArc *>(shape);
-                m_shapeActions = new QVPShapeActions(nullptr, QVP::ellipse, shape->getColor(),
+                m_shapeActions = new QVPShapeActions(nullptr, QVP::ellipticArc, shape->getColor(),
                                                      shape->getWidth(), arc->getCenter(),
                                                      arc->getA(), arc->getB(),
                                                      arc->getAng1(), arc->getAng2());
